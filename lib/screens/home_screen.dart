@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/screens/product_form_screen.dart';
+import 'package:hola_mundo/screens/sales_list_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 import 'product_list_screen.dart';
@@ -97,6 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => SalesScreen(), // Nueva pantalla de ventas
+                        ),
+                      );
+                    },
+                  ),
+                  _buildCard(
+                    context,
+                    title: 'Histórico ventas',
+                    icon: Icons.history,
+                    color: Colors.grey,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => SalesListScreen(), // Nueva pantalla de ventas
                         ),
                       );
                     },

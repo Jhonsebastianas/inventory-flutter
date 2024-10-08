@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/models/file_dto.dart';
 import 'package:hola_mundo/services/sale_service.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
 import 'package:hola_mundo/models/product.dart';
@@ -270,12 +271,11 @@ class _SalesScreenState extends State<SalesScreen> {
     Map<String, dynamic> sale = {
       'products': _selectedProducts.map((product) => product.toJson()).toList(),
       'paymentMethods': _paymentMethods.map((method) => method.toJson()).toList(),
-      'totalAmount': _totalAmount,
-      'receipt': _receiptFile != null ? await _receiptFile!.readAsBytes() : null,
+      'proofPayment': _receiptFile != null ? (await createFileDTO(File(_receiptFile!.path))).toMap() : null,
     };
 
     // Consumir el servicio de creación de venta
-    SaleService saleService = SaleService('http://localhost:3000');
+    SaleService saleService = SaleService();
     try {
       final response = await saleService.createSale(sale);
 

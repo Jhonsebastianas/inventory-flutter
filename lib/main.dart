@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Crear instancia de ApiService
-    final ApiService apiService = ApiService('http://localhost:3000');
+    final ApiService apiService = ApiService();
 
     return MultiProvider(
       providers: [

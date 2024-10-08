@@ -1,25 +1,43 @@
 import 'dart:io';
 
+import 'package:hola_mundo/models/file_dto.dart';
+
 class Sale {
   final String id;
-  final DateTime creationDate;
-  final String invoiceId;
+  final String? idUser;
+  final DateTime createdAt;
+  final String invoiceIdentifier;
   final List<SaleProduct> products;
   final List<PaymentMethod> paymentMethods;
-  final double totalAmount;
+  final double totalInvoiced;
   final int totalProducts;
-  final File? paymentReceipt;
+  final FileDTO? paymentReceipt;
 
   Sale({
     required this.id,
-    required this.creationDate,
-    required this.invoiceId,
+    this.idUser,
+    required this.createdAt,
+    required this.invoiceIdentifier,
     required this.products,
     required this.paymentMethods,
-    required this.totalAmount,
+    required this.totalInvoiced,
     required this.totalProducts,
     this.paymentReceipt,
   });
+
+  factory Sale.fromJson(Map<String, dynamic> json) {
+    return Sale(
+      id: json['id'],
+      idUser: json['idUser'],
+      createdAt: DateTime.parse(json['createdAt']),
+      invoiceIdentifier: json['invoiceIdentifier'],
+      products: (json['products'] as List).map((product) => SaleProduct.fromJson(product)).toList(),
+      paymentMethods: (json['paymentMethods'] as List).map((method) => PaymentMethod.fromJson(method)).toList(),
+      totalInvoiced: json['totalInvoiced'].toDouble(),
+      totalProducts: json['totalProducts'],
+      paymentReceipt: json['proofPayment'] != null ? FileDTO.fromJson(json['proofPayment']) : null,
+    );
+  }
 }
 
 class SaleProduct {
@@ -36,6 +54,15 @@ class SaleProduct {
       'price': price,
       'quantity': quantity,
     };
+  }
+
+  factory SaleProduct.fromJson(Map<String, dynamic> json) {
+    return SaleProduct(
+      id: json['idProducto'],
+      name: json['name'],
+      price: json['price'].toDouble(),
+      quantity: json['quantity'].toInt(),
+    );
   }
 
   SaleProduct({
@@ -56,6 +83,13 @@ class PaymentMethod {
       'type': type,
       'amount': amount,
     };
+  }
+
+  factory PaymentMethod.fromJson(Map<String, dynamic> json) {
+    return PaymentMethod(
+      type: json['type'],
+      amount: json['amount'].toDouble(),
+    );
   }
 
   PaymentMethod({
