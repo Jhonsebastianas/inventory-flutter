@@ -18,6 +18,7 @@ class ApiService {
     return await http.get(
       Uri.parse('$baseUrl/products'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -30,6 +31,7 @@ class ApiService {
     return await http.get(
       Uri.parse('$baseUrl/products/$id'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -42,6 +44,7 @@ class ApiService {
     return await http.post(
       Uri.parse('$baseUrl/products'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -55,6 +58,7 @@ class ApiService {
     return await http.put(
       Uri.parse('$baseUrl/products/$id'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -68,6 +72,7 @@ class ApiService {
     return await http.delete(
       Uri.parse('$baseUrl/products/$id'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -80,6 +85,7 @@ class ApiService {
     return await http.get(
       Uri.parse('$baseUrl/products/like/$name'),
       headers: {
+        'Cookie': 'fz_token=$token',
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json; charset=UTF-8',
       },

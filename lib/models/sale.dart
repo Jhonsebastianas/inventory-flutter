@@ -28,6 +28,16 @@ class SaleProduct {
   double price;
   int quantity;
 
+  // Convertir objeto Sale a JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'quantity': quantity,
+    };
+  }
+
   SaleProduct({
     required this.id,
     required this.name,
@@ -39,6 +49,14 @@ class SaleProduct {
 class PaymentMethod {
   String type;
   double amount;
+
+  // Convertir objeto PaymentMethod a JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'amount': amount,
+    };
+  }
 
   PaymentMethod({
     required this.type,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/services/sale_service.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
 import 'package:hola_mundo/models/product.dart';
 import 'dart:io';
@@ -241,7 +242,7 @@ class _SalesScreenState extends State<SalesScreen> {
   }
 
   // Método para completar la venta
-  void _completeSale() {
+  void _completeSale() async {
     double totalPaid = _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
 
     if (_selectedProducts.isEmpty) {
@@ -263,6 +264,42 @@ class _SalesScreenState extends State<SalesScreen> {
         SnackBar(content: Text('The payment covers more than the total amount.')),
       );
       return;
+    }
+
+    // Construir el objeto de la venta
+    Map<String, dynamic> sale = {
+      'products': _selectedProducts.map((product) => product.toJson()).toList(),
+      'paymentMethods': _paymentMethods.map((method) => method.toJson()).toList(),
+      'totalAmount': _totalAmount,
+      'receipt': _receiptFile != null ? await _receiptFile!.readAsBytes() : null,
+    };
+
+    // Consumir el servicio de creación de venta
+    SaleService saleService = SaleService('http://localhost:3000');
+    try {
+      final response = await saleService.createSale(sale);
+
+      if (response.statusCode == 201) {
+        // Venta creada exitosamente
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sale completed successfully!')),
+        );
+        setState(() {
+          _selectedProducts.clear();
+          _paymentMethods = [new PaymentMethod(type: EFECTIVO, amount: 0)];
+          _totalAmount = 0.0;
+          _receiptFile = null;
+        });
+        
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to complete sale. Error: ${response.body}')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
     }
 
     // Aquí podrías guardar la venta en MongoDB o en tu base de datos local.
