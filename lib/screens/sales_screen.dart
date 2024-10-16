@@ -17,7 +17,8 @@ class _SalesScreenState extends State<SalesScreen> {
   final String EFECTIVO = "Efectivo";
   List<SaleProduct> _selectedProducts = []; // Productos seleccionados para la venta
   double _totalAmount = 0.0;
-  List<PaymentMethod> _paymentMethods = [new PaymentMethod(type: "Efectivo", amount: 0)];
+  double _returned = 0.0;
+  List<PaymentMethod> _paymentMethods = [];
   XFile? _receiptFile; // Cambia a XFile para trabajar con image_picker
   final ImagePicker _picker = ImagePicker(); // Instancia de ImagePicker
 
@@ -29,16 +30,16 @@ class _SalesScreenState extends State<SalesScreen> {
   // Método para actualizar el total
   void _updateTotal() {
     double total = 0;
+    double totalPayments = 0;
     for (var product in _selectedProducts) {
       total += product.price * product.quantity;
     }
-    PaymentMethod efectivoMethod = _paymentMethods.first;
+    for(var payment in _paymentMethods) {
+      totalPayments += payment.amount;
+    }
     setState(() {
       _totalAmount = total;
-      try {
-        efectivoMethod.amount = _totalAmount;
-      } catch (e) {}
-      
+      _returned = totalPayments - total;
     });
   }
 
@@ -74,18 +75,18 @@ class _SalesScreenState extends State<SalesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Product'),
+          title: Text('Editar Producto'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: priceController,
-                decoration: InputDecoration(labelText: 'Price'),
+                decoration: InputDecoration(labelText: 'Precio'),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: quantityController,
-                decoration: InputDecoration(labelText: 'Quantity'),
+                decoration: InputDecoration(labelText: 'Cantidad'),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -100,7 +101,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 _updateTotal();
                 Navigator.pop(context);
               },
-              child: Text('Save'),
+              child: Text('Confirmar'),
             ),
           ],
         );
@@ -116,17 +117,17 @@ class _SalesScreenState extends State<SalesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Payment Method'),
+          title: Text('Editar método de pago'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: typeController,
-                decoration: InputDecoration(labelText: 'Payment Type'),
+                decoration: InputDecoration(labelText: 'Forma de pago'),
               ),
               TextField(
                 controller: amountController,
-                decoration: InputDecoration(labelText: 'Amount'),
+                decoration: InputDecoration(labelText: 'Monto'),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -137,10 +138,11 @@ class _SalesScreenState extends State<SalesScreen> {
                 setState(() {
                   paymentMethod.type = typeController.text;
                   paymentMethod.amount = double.parse(amountController.text);
+                  _updateTotal();
                 });
                 Navigator.pop(context);
               },
-              child: Text('Save'),
+              child: Text('Confirmar'),
             ),
           ],
         );
@@ -167,13 +169,13 @@ class _SalesScreenState extends State<SalesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add Payment Method'),
+          title: Text('Añadir método de pago'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 value: selectedPaymentType,
-                decoration: InputDecoration(labelText: 'Payment Type'),
+                decoration: InputDecoration(labelText: 'Forma de pago'),
                 items: [
                   DropdownMenuItem(
                     child: Text('Efectivo'),
@@ -200,7 +202,7 @@ class _SalesScreenState extends State<SalesScreen> {
               ),
               TextField(
                 controller: amountController,
-                decoration: InputDecoration(labelText: 'Amount'),
+                decoration: InputDecoration(labelText: 'Monto'),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -215,10 +217,11 @@ class _SalesScreenState extends State<SalesScreen> {
                       amount: double.parse(amountController.text),
                     ),
                   );
+                  _updateTotal();
                 });
                 Navigator.pop(context);
               },
-              child: Text('Add'),
+              child: Text('Confirmar'),
             ),
           ],
         );
@@ -248,21 +251,14 @@ class _SalesScreenState extends State<SalesScreen> {
 
     if (_selectedProducts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No products selected.')),
+        SnackBar(content: Text('No hay productos seleccionados.')),
       );
       return;
     }
 
     if (totalPaid < _totalAmount) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Payment does not cover the total amount.')),
-      );
-      return;
-    }
-
-    if (totalPaid > _totalAmount) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('The payment covers more than the total amount.')),
+        SnackBar(content: Text('El pago no cubre el valor total de la venta.')),
       );
       return;
     }
@@ -282,7 +278,7 @@ class _SalesScreenState extends State<SalesScreen> {
       if (response.statusCode == 201) {
         // Venta creada exitosamente
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sale completed successfully!')),
+          SnackBar(content: Text('¡Venta realizada con éxito!')),
         );
         setState(() {
           _selectedProducts.clear();
@@ -293,7 +289,7 @@ class _SalesScreenState extends State<SalesScreen> {
         
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to complete sale. Error: ${response.body}')),
+          SnackBar(content: Text('No se ha podido completar la venta. Error: ${response.body}')),
         );
       }
     } catch (error) {
@@ -313,7 +309,7 @@ class _SalesScreenState extends State<SalesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sales'),
+        title: Text('Venta'),
       ),
       body: Column(
         children: [
@@ -322,7 +318,7 @@ class _SalesScreenState extends State<SalesScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
-                labelText: 'Search product',
+                labelText: 'Buscar producto',
                 suffixIcon: Icon(Icons.search),
               ),
               onChanged: (query) {
@@ -339,7 +335,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 final product = filteredProducts[index];
                 return ListTile(
                   title: Text(product.name),
-                  subtitle: Text('Price: \$${product.price}'),
+                  subtitle: Text('Precio: \$${product.price}'),
                   onTap: () => _selectProduct(product),
                 );
               },
@@ -354,7 +350,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 final product = _selectedProducts[index];
                 return ListTile(
                   title: Text(product.name),
-                  subtitle: Text('Price: \$${product.price}, Quantity: ${product.quantity}'),
+                  subtitle: Text('\$${product.price} - Cantidad: ${product.quantity}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el ancho
                     children: [
@@ -375,16 +371,19 @@ class _SalesScreenState extends State<SalesScreen> {
 
           // Mostrar total
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(5.0),
             child: Text('Total: \$$_totalAmount'),
           ),
+          
 
           // Botón para añadir método de pago
           ElevatedButton.icon(
             onPressed: _addPaymentMethod,
             icon: Icon(Icons.payment),
-            label: Text('Add Payment Method'),
+            label: Text('Añadir método de pago'),
           ),
+
+          
 
           // Lista de métodos de pago
           Expanded(
@@ -394,7 +393,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 final method = _paymentMethods[index];
                 return ListTile(
                   title: Text('${method.type}'),
-                  subtitle: Text('Amount: \$${method.amount}'),
+                  subtitle: Text('\$${method.amount}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el ancho
                     children: [
@@ -413,17 +412,24 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
           ),
 
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _returned > 0 
+                ? Text('Cambio: \$$_returned') 
+                : Text('Falta: \$${_returned.abs()}'), // Widget vacío si no cumple la condición
+          ),
+
           // Botón para tomar foto del comprobante
           ElevatedButton.icon(
             onPressed: _takePhoto,
             icon: Icon(Icons.camera_alt),
-            label: Text(_receiptFile != null ? 'Receipt Captured' : 'Take Receipt Photo'),
+            label: Text(_receiptFile != null ? 'Comprobante capturado' : 'Tomar foto del comprobante'),
           ),
 
           // Botón para completar la venta
           ElevatedButton(
             onPressed: _completeSale,
-            child: Text('Complete Sale'),
+            child: Text('Confirmar'),
           ),
         ],
       ),
