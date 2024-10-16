@@ -78000,7 +78000,7 @@ $1(a){return new A.kx(null,null)},
 $S:99}
 A.a9a.prototype={
 $2(a,b){var s=null,r=this.a,q=r.a[b],p=A.b3(q.b,s,s,s,s,s,s)
-return A.y0(new A.a96(a,q),A.b3("$"+B.c.a9(q.d,2)+"\nExistencias: "+q.e,s,s,s,s,s,s),p,A.k7(s,B.Eo,s,new A.a97(r,q),s,s))},
+return A.y0(new A.a96(a,q),A.b3(q.c+"\n$"+B.c.a9(q.d,2)+"\nExistencias: "+q.e,s,s,s,s,s,s),p,A.k7(s,B.Eo,s,new A.a97(r,q),s,s))},
 $S:48}
 A.a96.prototype={
 $0(){A.da(this.a,!1).f2(A.ht(new A.a95(this.b),null,t.z))},
