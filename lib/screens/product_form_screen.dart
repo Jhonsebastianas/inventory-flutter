@@ -17,6 +17,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late String _description;
   late double _price;
   late int _stock;
+  late double _percentageTax;
 
   @override
   void initState() {
@@ -26,11 +27,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _description = widget.product!.description;
       _price = widget.product!.price;
       _stock = widget.product!.stock;
+      _percentageTax = widget.product!.percentageTax;
     } else {
       _name = '';
       _description = '';
       _price = 0.0;
       _stock = 0;
+      _percentageTax = 0;
     }
   }
 
@@ -44,6 +47,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: _description,
           price: _price,
           stock: _stock,
+          percentageTax: _percentageTax,
         );
         Provider.of<ProductProvider>(context, listen: false)
             .addProduct(newProduct);
@@ -54,6 +58,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: _description,
           price: _price,
           stock: _stock,
+          percentageTax: _percentageTax
         );
         Provider.of<ProductProvider>(context, listen: false)
             .updateProduct(widget.product!.id, updatedProduct);
@@ -89,7 +94,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               TextFormField(
                 initialValue: _description,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
                 onSaved: (value) {
                   _description = value!;
                 },
@@ -117,6 +122,20 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 },
                 validator: (value) {
                   if (value == null || int.tryParse(value) == null) {
+                    return 'Por favor ingrese un precio válido.';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                initialValue: _percentageTax.toString(),
+                decoration: const InputDecoration(labelText: 'IVA (opcional)'),
+                keyboardType: TextInputType.number,
+                onSaved: (value) {
+                  _percentageTax = double.parse(value!);
+                },
+                validator: (value) {
+                  if (value == null || double.tryParse(value) == null) {
                     return 'Por favor ingrese un precio válido.';
                   }
                   return null;

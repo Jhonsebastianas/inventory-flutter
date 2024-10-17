@@ -34,7 +34,7 @@ class ProductListScreen extends StatelessWidget {
                 final product = productProvider.products[index];
                 return ListTile(
                   title: Text(product.name),
-                  subtitle: Text('${product.description}\n\$${product.price.toStringAsFixed(2)}\nExistencias: ${product.stock}'),
+                  subtitle: Text('${product.description}\n\$${product.price.toStringAsFixed(2)}\nIVA ${product.percentageTax}\nExistencias: ${product.stock}'),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

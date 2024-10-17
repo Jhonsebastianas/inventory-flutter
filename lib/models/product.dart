@@ -4,6 +4,7 @@ class Product {
   String description;
   double price;
   int stock;
+  double percentageTax;
 
   // Convertir JSON a objeto Product
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -15,6 +16,7 @@ class Product {
           : json['price'].toDouble(), // Para Number normal
       description: json['description'],
       stock: json['stock'],
+      percentageTax: json['percentageTax'],
     );
   }
 
@@ -26,6 +28,7 @@ class Product {
       'description': description,
       'price': price,
       'stock': stock,
+      'percentageTax': percentageTax,
     };
   }
 
@@ -35,5 +38,6 @@ class Product {
     required this.description,
     required this.price,
     required this.stock,
+    required this.percentageTax,
   });
 }
