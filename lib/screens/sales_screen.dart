@@ -286,6 +286,8 @@ class _SalesScreenState extends State<SalesScreen> {
           _totalAmount = 0.0;
           _receiptFile = null;
         });
+        Provider.of<ProductProvider>(context, listen: false)
+            .fetchProducts();
         
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
