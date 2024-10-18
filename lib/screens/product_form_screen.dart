@@ -18,6 +18,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late double _price;
   late int _stock;
   late double _percentageTax;
+  List<StockDetail> _stockDetails = [];
 
   @override
   void initState() {
@@ -28,12 +29,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _price = widget.product!.price;
       _stock = widget.product!.stock;
       _percentageTax = widget.product!.percentageTax;
+      _stockDetails = widget.product!.stockDetails;
     } else {
       _name = '';
       _description = '';
       _price = 0.0;
       _stock = 0;
       _percentageTax = 0;
+      _stockDetails = [];
     }
   }
 
@@ -48,6 +51,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           price: _price,
           stock: _stock,
           percentageTax: _percentageTax,
+          stockDetails: _stockDetails,
         );
         Provider.of<ProductProvider>(context, listen: false)
             .addProduct(newProduct);
@@ -58,13 +62,107 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: _description,
           price: _price,
           stock: _stock,
-          percentageTax: _percentageTax
+          percentageTax: _percentageTax,
+          stockDetails: _stockDetails,
         );
         Provider.of<ProductProvider>(context, listen: false)
             .updateProduct(widget.product!.id, updatedProduct);
       }
       Navigator.of(context).pop();
     }
+  }
+
+ // STOCK INFORMATION
+  void updateStock() {
+    int totalStock = 0;
+    for (var stockSum in _stockDetails) {
+      totalStock += stockSum.quantity;
+    }
+    setState(() {
+      _stock = totalStock;
+      print(_stock);
+    });
+  }
+
+  // Mostrar el formulario para añadir o editar detalles del inventario en una ventana emergente
+  void _showStockDetailDialog({StockDetail? stockDetail, int? index}) {
+    final _providerController = TextEditingController(text: stockDetail?.provider ?? '');
+    final _priceController = TextEditingController(text: stockDetail?.purchasePrice.toString() ?? '0.0');
+    final _quantityController = TextEditingController(text: stockDetail?.quantity.toString() ?? '0');
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(stockDetail == null ? 'Añadir Detalle de Inventario' : 'Modificar Detalle de Inventario'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _providerController,
+                decoration: const InputDecoration(labelText: 'Proveedor (opcional)'),
+              ),
+              TextFormField(
+                controller: _priceController,
+                decoration: const InputDecoration(labelText: 'Precio de compra'),
+                keyboardType: TextInputType.number,
+              ),
+              TextFormField(
+                controller: _quantityController,
+                decoration: const InputDecoration(labelText: 'Cantidad'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final provider = _providerController.text;
+                final price = double.tryParse(_priceController.text) ?? 0.0;
+                final quantity = int.tryParse(_quantityController.text) ?? 0;
+
+                if (quantity == 0 || price == 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Diigencie la información')),
+                  );
+                  return;
+                }
+
+                setState(() {
+                  if (index != null) {
+                    // Editar detalle existente
+                    _stockDetails[index] = StockDetail(
+                      id: stockDetail!.id,
+                      provider: provider,
+                      purchasePrice: price,
+                      quantity: quantity,
+                    );
+                  } else {
+                    // Añadir nuevo detalle
+                    _stockDetails.add(
+                      StockDetail(
+                        id: (_stockDetails.length + 1).toString(),
+                        provider: provider,
+                        purchasePrice: price,
+                        quantity: quantity,
+                      ),
+                    );
+                  }
+                  updateStock();
+                });
+
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -114,20 +212,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 },
               ),
               TextFormField(
-                initialValue: _stock.toString(),
-                decoration: const InputDecoration(labelText: 'En inventario'),
-                keyboardType: TextInputType.number,
-                onSaved: (value) {
-                  _stock = int.parse(value!);
-                },
-                validator: (value) {
-                  if (value == null || int.tryParse(value) == null) {
-                    return 'Por favor ingrese un precio válido.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
                 initialValue: _percentageTax.toString(),
                 decoration: const InputDecoration(labelText: 'IVA (opcional)'),
                 keyboardType: TextInputType.number,
@@ -140,6 +224,53 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'En inventario: $_stock',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              // Botón para añadir detalles de inventario
+              ElevatedButton(
+                onPressed: () => _showStockDetailDialog(),
+                child: const Text('Añadir detalle de inventario'),
+              ),
+              // Mostrar los detalles del stock en una lista
+              // Mostrar los detalles del stock en una lista
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _stockDetails.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text('Proveedor: ${_stockDetails[index].provider}, Precio: ${_stockDetails[index].purchasePrice}, Cantidad: ${_stockDetails[index].quantity}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              // Abrir ventana para modificar detalle
+                              _showStockDetailDialog(
+                                stockDetail: _stockDetails[index],
+                                index: index,
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                _stockDetails.removeAt(index);
+                                updateStock();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
