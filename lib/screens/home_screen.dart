@@ -209,7 +209,6 @@ class ProductScreen extends StatelessWidget {
               color: Colors.blue,
               onTap: () {
                 // update products
-                Provider.of<ProductProvider>(context, listen: false).fetchProducts();
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => ProductListScreen(),
