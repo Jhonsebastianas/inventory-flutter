@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/providers/product_provider.dart';
 import 'package:hola_mundo/screens/product_form_screen.dart';
 import 'package:hola_mundo/screens/sales_list_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 import 'product_list_screen.dart';
@@ -206,6 +208,8 @@ class ProductScreen extends StatelessWidget {
               icon: Icons.list,
               color: Colors.blue,
               onTap: () {
+                // update products
+                Provider.of<ProductProvider>(context, listen: false).fetchProducts();
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => ProductListScreen(),

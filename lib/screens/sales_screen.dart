@@ -285,9 +285,10 @@ class _SalesScreenState extends State<SalesScreen> {
           _paymentMethods = [new PaymentMethod(type: EFECTIVO, amount: 0)];
           _totalAmount = 0.0;
           _receiptFile = null;
-        });
-        Provider.of<ProductProvider>(context, listen: false)
+          Provider.of<ProductProvider>(context, listen: false)
             .fetchProducts();
+        });
+        
         
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
