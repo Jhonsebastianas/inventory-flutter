@@ -5,6 +5,7 @@ class StockDetail {
   int quantity;
   int quantityPurchased;
   double totalGrossProfit;
+  double totalPurchasePrice;
 
   StockDetail({
     required this.id,
@@ -13,6 +14,7 @@ class StockDetail {
     required this.quantity,
     required this.quantityPurchased,
     required this.totalGrossProfit,
+    required this.totalPurchasePrice,
   });
 
   factory StockDetail.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,9 @@ class StockDetail {
       totalGrossProfit: json['totalGrossProfit'] is Map<String, dynamic> 
           ? (json['totalGrossProfit'] != null) ? double.parse(json['totalGrossProfit']) : 0.0 // Para Decimal128
           : (json['totalGrossProfit'] != null) ? json['totalGrossProfit'].toDouble() : 0.0, // Para Number normal
+      totalPurchasePrice: json['totalPurchasePrice'] is Map<String, dynamic> 
+          ? (json['totalPurchasePrice'] != null) ? double.parse(json['totalPurchasePrice']) : 0.0 // Para Decimal128
+          : (json['totalPurchasePrice'] != null) ? json['totalPurchasePrice'].toDouble() : 0.0, // Para Number normal
     );
   }
 
@@ -38,6 +43,7 @@ class StockDetail {
       'quantity': quantity,
       'quantityPurchased': quantityPurchased,
       'totalGrossProfit': totalGrossProfit,
+      'totalPurchasePrice': totalPurchasePrice,
     };
   }
 }
@@ -51,6 +57,7 @@ class Product {
   int stock;
   double percentageTax;
   List<StockDetail> stockDetails;
+  double weightedAveragePurchasePrice;
 
   Product({
     required this.id,
@@ -61,6 +68,7 @@ class Product {
     required this.stock,
     required this.percentageTax,
     required this.stockDetails,
+    required this.weightedAveragePurchasePrice,
   });
 
   // Convertir JSON a objeto Product
@@ -80,22 +88,14 @@ class Product {
       stockDetails: (json['stockDetails'] as List)
           .map((detail) => StockDetail.fromJson(detail))
           .toList(),
+      weightedAveragePurchasePrice: json['weightedAveragePurchasePrice'] is Map<String, dynamic> 
+          ? (json['weightedAveragePurchasePrice'] != null) ? double.parse(json['weightedAveragePurchasePrice']) : 0.0 // Para Decimal128
+          : (json['weightedAveragePurchasePrice'] != null) ? json['weightedAveragePurchasePrice'].toDouble() : 0.0, // Para Number normal
     );
   }
 
   // Convertir objeto Product a JSON
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = {
-      'id': id,
-      'businessId': businessId,
-      'name': name,
-      'description': description,
-      'price': price,
-      'stock': stock,
-      'percentageTax': percentageTax,
-      'stockDetails': stockDetails.map((detail) => detail.toJson()).toList(),
-    };
-
     return {
       'id': id,
       'businessId': businessId,
@@ -105,6 +105,7 @@ class Product {
       'stock': stock,
       'percentageTax': percentageTax,
       'stockDetails': stockDetails.map((detail) => detail.toJson()).toList(),
+      'weightedAveragePurchasePrice': weightedAveragePurchasePrice,
     };
   }
 

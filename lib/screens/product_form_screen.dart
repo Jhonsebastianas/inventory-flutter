@@ -19,6 +19,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late int _stock;
   late double _percentageTax;
   List<StockDetail> _stockDetails = [];
+  late double _weightedAveragePurchasePrice;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _stock = widget.product!.stock;
       _percentageTax = widget.product!.percentageTax;
       _stockDetails = widget.product!.stockDetails;
+      _weightedAveragePurchasePrice = widget.product!.weightedAveragePurchasePrice;
     } else {
       _name = '';
       _description = '';
@@ -37,6 +39,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _stock = 0;
       _percentageTax = 0;
       _stockDetails = [];
+      _weightedAveragePurchasePrice = 0.0;
     }
   }
 
@@ -53,6 +56,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           stock: _stock,
           percentageTax: _percentageTax,
           stockDetails: _stockDetails,
+          weightedAveragePurchasePrice: _weightedAveragePurchasePrice,
         );
         Provider.of<ProductProvider>(context, listen: false)
             .addProduct(newProduct);
@@ -66,6 +70,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           stock: _stock,
           percentageTax: _percentageTax,
           stockDetails: _stockDetails,
+          weightedAveragePurchasePrice: _weightedAveragePurchasePrice,
         );
         Provider.of<ProductProvider>(context, listen: false)
             .updateProduct(widget.product!.id, updatedProduct);
@@ -77,12 +82,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   // STOCK INFORMATION
   void updateStock() {
     int totalStock = 0;
+    double sumTotalPurchasePrices = 0;
     for (var stockSum in _stockDetails) {
       totalStock += stockSum.quantity;
+      sumTotalPurchasePrices += stockSum.purchasePrice * stockSum.quantity;
     }
     setState(() {
       _stock = totalStock;
-      print(_stock);
+      _weightedAveragePurchasePrice = sumTotalPurchasePrices / totalStock;
     });
   }
 
@@ -151,6 +158,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       purchasePrice: price,
                       quantity: quantity,
                       quantityPurchased: stockDetail!.quantityPurchased,
+                      totalPurchasePrice: quantity * price,
                     );
                   } else {
                     // Añadir nuevo detalle
@@ -162,6 +170,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         purchasePrice: price,
                         quantity: quantity,
                         quantityPurchased: quantity,
+                        totalPurchasePrice: quantity * price,
                       ),
                     );
                   }
@@ -243,6 +252,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               const SizedBox(height: 20),
               Text(
                 'En inventario: $_stock',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Precio promedio ponderado: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
