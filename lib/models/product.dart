@@ -3,12 +3,16 @@ class StockDetail {
   String provider;
   double purchasePrice;
   int quantity;
+  int quantityPurchased;
+  double totalGrossProfit;
 
   StockDetail({
     required this.id,
     required this.provider,
     required this.purchasePrice,
     required this.quantity,
+    required this.quantityPurchased,
+    required this.totalGrossProfit,
   });
 
   factory StockDetail.fromJson(Map<String, dynamic> json) {
@@ -17,6 +21,12 @@ class StockDetail {
       provider: json['provider'],
       purchasePrice: json['purchasePrice'].toDouble(),
       quantity: json['quantity'],
+      quantityPurchased: json['quantityPurchased'] is Map<String, dynamic> 
+          ? (json['quantityPurchased'] != null) ? int.parse(json['quantityPurchased']) : 0 // Para Decimal128
+          : (json['quantityPurchased'] != null) ? json['quantityPurchased'] : 0, // Para Number normal
+      totalGrossProfit: json['totalGrossProfit'] is Map<String, dynamic> 
+          ? (json['totalGrossProfit'] != null) ? double.parse(json['totalGrossProfit']) : 0.0 // Para Decimal128
+          : (json['totalGrossProfit'] != null) ? json['totalGrossProfit'].toDouble() : 0.0, // Para Number normal
     );
   }
 
@@ -26,12 +36,15 @@ class StockDetail {
       'provider': provider,
       'purchasePrice': purchasePrice,
       'quantity': quantity,
+      'quantityPurchased': quantityPurchased,
+      'totalGrossProfit': totalGrossProfit,
     };
   }
 }
 
 class Product {
   String id;
+  String businessId;
   String name;
   String description;
   double price;
@@ -41,6 +54,7 @@ class Product {
 
   Product({
     required this.id,
+    required this.businessId,
     required this.name,
     required this.description,
     required this.price,
@@ -53,6 +67,7 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
+      businessId: json['businessId'],
       name: json['name'],
       price: json['price'] is Map<String, dynamic> 
           ? double.parse(json['price']) // Para Decimal128
@@ -72,6 +87,7 @@ class Product {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
       'id': id,
+      'businessId': businessId,
       'name': name,
       'description': description,
       'price': price,
@@ -80,9 +96,9 @@ class Product {
       'stockDetails': stockDetails.map((detail) => detail.toJson()).toList(),
     };
 
-    print("MAP ${map}");
     return {
       'id': id,
+      'businessId': businessId,
       'name': name,
       'description': description,
       'price': price,

@@ -46,6 +46,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       if (widget.product == null) {
         final newProduct = Product(
           id: DateTime.now().toString(),
+          businessId: DateTime.now().toString(),
           name: _name,
           description: _description,
           price: _price,
@@ -58,6 +59,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       } else {
         final updatedProduct = Product(
           id: widget.product!.id,
+          businessId: widget.product!.businessId,
           name: _name,
           description: _description,
           price: _price,
@@ -72,7 +74,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
- // STOCK INFORMATION
+  // STOCK INFORMATION
   void updateStock() {
     int totalStock = 0;
     for (var stockSum in _stockDetails) {
@@ -86,25 +88,32 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   // Mostrar el formulario para añadir o editar detalles del inventario en una ventana emergente
   void _showStockDetailDialog({StockDetail? stockDetail, int? index}) {
-    final _providerController = TextEditingController(text: stockDetail?.provider ?? '');
-    final _priceController = TextEditingController(text: stockDetail?.purchasePrice.toString() ?? '0.0');
-    final _quantityController = TextEditingController(text: stockDetail?.quantity.toString() ?? '0');
+    final _providerController =
+        TextEditingController(text: stockDetail?.provider ?? '');
+    final _priceController = TextEditingController(
+        text: stockDetail?.purchasePrice.toString() ?? '0.0');
+    final _quantityController =
+        TextEditingController(text: stockDetail?.quantity.toString() ?? '0');
 
     showDialog(
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Text(stockDetail == null ? 'Añadir Detalle de Inventario' : 'Modificar Detalle de Inventario'),
+          title: Text(stockDetail == null
+              ? 'Añadir Detalle de Inventario'
+              : 'Modificar Detalle de Inventario'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
                 controller: _providerController,
-                decoration: const InputDecoration(labelText: 'Proveedor (opcional)'),
+                decoration:
+                    const InputDecoration(labelText: 'Proveedor (opcional)'),
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Precio de compra'),
+                decoration: const InputDecoration(
+                    labelText: 'Precio de compra (unitario)'),
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
@@ -137,18 +146,22 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     // Editar detalle existente
                     _stockDetails[index] = StockDetail(
                       id: stockDetail!.id,
+                      totalGrossProfit: stockDetail!.totalGrossProfit,
                       provider: provider,
                       purchasePrice: price,
                       quantity: quantity,
+                      quantityPurchased: stockDetail!.quantityPurchased,
                     );
                   } else {
                     // Añadir nuevo detalle
                     _stockDetails.add(
                       StockDetail(
                         id: (_stockDetails.length + 1).toString(),
+                        totalGrossProfit: 0.0,
                         provider: provider,
                         purchasePrice: price,
                         quantity: quantity,
+                        quantityPurchased: quantity,
                       ),
                     );
                   }
@@ -169,7 +182,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.product == null ? 'Agregar Producto' : 'Editar Producto'),
+        title: Text(
+            widget.product == null ? 'Agregar Producto' : 'Editar Producto'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -192,14 +206,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               TextFormField(
                 initialValue: _description,
-                decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
+                decoration:
+                    const InputDecoration(labelText: 'Descripción (opcional)'),
                 onSaved: (value) {
                   _description = value!;
                 },
               ),
               TextFormField(
                 initialValue: _price.toString(),
-                decoration: const InputDecoration(labelText: 'Precio'),
+                decoration: const InputDecoration(labelText: 'Precio de venta'),
                 keyboardType: TextInputType.number,
                 onSaved: (value) {
                   _price = double.parse(value!);
@@ -242,36 +257,75 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 child: ListView.builder(
                   itemCount: _stockDetails.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text('Proveedor: ${_stockDetails[index].provider}, Precio: ${_stockDetails[index].purchasePrice}, Cantidad: ${_stockDetails[index].quantity}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              // Abrir ventana para modificar detalle
-                              _showStockDetailDialog(
-                                stockDetail: _stockDetails[index],
-                                index: index,
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                _stockDetails.removeAt(index);
-                                updateStock();
-                              });
-                            },
-                          ),
-                        ],
+                    final stockDetail = _stockDetails[index];
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Información de los detalles del stock organizada en una columna
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Proveedor: ${stockDetail.provider}',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                      'Precio de compra: \$${stockDetail.purchasePrice.toStringAsFixed(2)}'),
+                                  const SizedBox(height: 5),
+                                  Text('Unidades compradas: ${stockDetail.quantityPurchased}'),
+                                  const SizedBox(height: 5),
+                                  Text('En inventario: ${stockDetail.quantity}'),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                      'Ganancia bruta total: \$${stockDetail.totalGrossProfit.toStringAsFixed(2)}'),
+                                ],
+                              ),
+                            ),
+                            // Botones de acción (Editar, Eliminar)
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      // Abrir ventana para modificar detalle
+                                      _showStockDetailDialog(
+                                        stockDetail: stockDetail,
+                                        index: index,
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      setState(() {
+                                        _stockDetails.removeAt(index);
+                                        updateStock();
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
                 ),
               ),
+
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveForm,
