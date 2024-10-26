@@ -15,15 +15,20 @@ class SalesScreen extends StatefulWidget {
 
 class _SalesScreenState extends State<SalesScreen> {
   final String EFECTIVO = "Efectivo";
-  List<SaleProduct> _selectedProducts = []; // Productos seleccionados para la venta
+  List<SaleProduct> _selectedProducts =
+      []; // Productos seleccionados para la venta
   double _totalAmount = 0.0;
   double _returned = 0.0;
   List<PaymentMethod> _paymentMethods = [];
   XFile? _receiptFile; // Cambia a XFile para trabajar con image_picker
   final ImagePicker _picker = ImagePicker(); // Instancia de ImagePicker
+  bool _isSearching = false;
 
   // Método para buscar productos
   void _searchProduct(String query) {
+    setState(() {
+      _isSearching = query.isNotEmpty;
+    });
     Provider.of<ProductProvider>(context, listen: false).searchProducts(query);
   }
 
@@ -34,7 +39,7 @@ class _SalesScreenState extends State<SalesScreen> {
     for (var product in _selectedProducts) {
       total += product.price * product.quantity;
     }
-    for(var payment in _paymentMethods) {
+    for (var payment in _paymentMethods) {
       totalPayments += payment.amount;
     }
     setState(() {
@@ -50,8 +55,8 @@ class _SalesScreenState extends State<SalesScreen> {
         return;
       }
     }
-    SaleProduct saleProduct = new SaleProduct(id: product.id, 
-        name: product.name, price: product.price, quantity: 1);
+    SaleProduct saleProduct = new SaleProduct(
+        id: product.id, name: product.name, price: product.price, quantity: 1);
     setState(() {
       _selectedProducts.add(saleProduct);
     });
@@ -68,8 +73,10 @@ class _SalesScreenState extends State<SalesScreen> {
 
   // Método para editar cantidad y precio
   void _editProduct(SaleProduct product) {
-    TextEditingController priceController = TextEditingController(text: product.price.toString());
-    TextEditingController quantityController = TextEditingController(text: product.quantity.toString());
+    TextEditingController priceController =
+        TextEditingController(text: product.price.toString());
+    TextEditingController quantityController =
+        TextEditingController(text: product.quantity.toString());
 
     showDialog(
       context: context,
@@ -110,8 +117,10 @@ class _SalesScreenState extends State<SalesScreen> {
   }
 
   void _editPaymentMethod(PaymentMethod paymentMethod) {
-    TextEditingController typeController = TextEditingController(text: paymentMethod.type);
-    TextEditingController amountController = TextEditingController(text: paymentMethod.amount.toString());
+    TextEditingController typeController =
+        TextEditingController(text: paymentMethod.type);
+    TextEditingController amountController =
+        TextEditingController(text: paymentMethod.amount.toString());
 
     showDialog(
       context: context,
@@ -152,7 +161,8 @@ class _SalesScreenState extends State<SalesScreen> {
 
   void _deletePaymentMethod(PaymentMethod paymentMethod) {
     setState(() {
-      _paymentMethods.removeWhere((method) => method.type == paymentMethod.type);
+      _paymentMethods
+          .removeWhere((method) => method.type == paymentMethod.type);
     });
     if (_paymentMethods.length == 1) {
       _updateTotal();
@@ -196,7 +206,8 @@ class _SalesScreenState extends State<SalesScreen> {
                 ],
                 onChanged: (value) {
                   setState(() {
-                    selectedPaymentType = value; // Actualiza el estado con el tipo de pago seleccionado
+                    selectedPaymentType =
+                        value; // Actualiza el estado con el tipo de pago seleccionado
                   });
                 },
               ),
@@ -247,7 +258,8 @@ class _SalesScreenState extends State<SalesScreen> {
 
   // Método para completar la venta
   void _completeSale() async {
-    double totalPaid = _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
+    double totalPaid =
+        _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
 
     if (_selectedProducts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -266,8 +278,11 @@ class _SalesScreenState extends State<SalesScreen> {
     // Construir el objeto de la venta
     Map<String, dynamic> sale = {
       'products': _selectedProducts.map((product) => product.toJson()).toList(),
-      'paymentMethods': _paymentMethods.map((method) => method.toJson()).toList(),
-      'proofPayment': _receiptFile != null ? (await createFileDTO(File(_receiptFile!.path))).toMap() : null,
+      'paymentMethods':
+          _paymentMethods.map((method) => method.toJson()).toList(),
+      'proofPayment': _receiptFile != null
+          ? (await createFileDTO(File(_receiptFile!.path))).toMap()
+          : null,
     };
 
     // Consumir el servicio de creación de venta
@@ -285,14 +300,13 @@ class _SalesScreenState extends State<SalesScreen> {
           _paymentMethods = [new PaymentMethod(type: EFECTIVO, amount: 0)];
           _totalAmount = 0.0;
           _receiptFile = null;
-          Provider.of<ProductProvider>(context, listen: false)
-            .fetchProducts();
+          Provider.of<ProductProvider>(context, listen: false).fetchProducts();
         });
-        
-        
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se ha podido completar la venta. Error: ${response.body}')),
+          SnackBar(
+              content: Text(
+                  'No se ha podido completar la venta. Error: ${response.body}')),
         );
       }
     } catch (error) {
@@ -316,34 +330,63 @@ class _SalesScreenState extends State<SalesScreen> {
       ),
       body: Column(
         children: [
-          // Buscar producto
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Buscar producto',
-                suffixIcon: Icon(Icons.search),
-              ),
-              onChanged: (query) {
-                _searchProduct(query);
-              },
+          // Barra de búsqueda con fondo
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            padding: EdgeInsets.all(8.0),
+            //color: Colors.grey[200],
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: 'Buscar producto',
+                      hintText: 'Ingresa el nombre del producto',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: _searchProduct,
+                    onTap: () {
+                      setState(() {
+                        _isSearching = true;
+                      });
+                    },
+                  ),
+                ),
+                if (_isSearching)
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = false;
+                        _searchProduct(''); // Limpia la búsqueda
+                      });
+                    },
+                  ),
+              ],
             ),
           ),
 
-          // Mostrar productos filtrados
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredProducts.length,
-              itemBuilder: (context, index) {
-                final product = filteredProducts[index];
-                return ListTile(
-                  title: Text(product.name),
-                  subtitle: Text('Precio: \$${product.price}'),
-                  onTap: () => _selectProduct(product),
-                );
-              },
+          // Muestra los productos filtrados solo si _isSearching es verdadero
+          if (_isSearching)
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredProducts.length,
+                itemBuilder: (context, index) {
+                  final product = filteredProducts[index];
+                  return ListTile(
+                    title: Text(product.name),
+                    subtitle: Text('Precio: \$${product.price}'),
+                    onTap: () => _selectProduct(product),
+                  );
+                },
+              ),
             ),
-          ),
 
           // Lista de productos seleccionados
           Expanded(
@@ -353,9 +396,11 @@ class _SalesScreenState extends State<SalesScreen> {
                 final product = _selectedProducts[index];
                 return ListTile(
                   title: Text(product.name),
-                  subtitle: Text('\$${product.price} - Cantidad: ${product.quantity}'),
+                  subtitle: Text(
+                      '\$${product.price} - Cantidad: ${product.quantity}'),
                   trailing: Row(
-                    mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el ancho
+                    mainAxisSize: MainAxisSize
+                        .min, // Para que el Row no ocupe todo el ancho
                     children: [
                       IconButton(
                         icon: Icon(Icons.edit),
@@ -363,7 +408,8 @@ class _SalesScreenState extends State<SalesScreen> {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete), // Icono para eliminar
-                        onPressed: () => _deleteProduct(product), // Llama a tu función para eliminar
+                        onPressed: () => _deleteProduct(
+                            product), // Llama a tu función para eliminar
                       ),
                     ],
                   ),
@@ -372,21 +418,12 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
           ),
 
-          // Mostrar total
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Text('Total: \$$_totalAmount'),
-          ),
-          
-
           // Botón para añadir método de pago
           ElevatedButton.icon(
             onPressed: _addPaymentMethod,
             icon: Icon(Icons.payment),
             label: Text('Añadir método de pago'),
           ),
-
-          
 
           // Lista de métodos de pago
           Expanded(
@@ -398,16 +435,19 @@ class _SalesScreenState extends State<SalesScreen> {
                   title: Text('${method.type}'),
                   subtitle: Text('\$${method.amount}'),
                   trailing: Row(
-                    mainAxisSize: MainAxisSize.min, // Para que el Row no ocupe todo el ancho
+                    mainAxisSize: MainAxisSize
+                        .min, // Para que el Row no ocupe todo el ancho
                     children: [
                       IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () => _editPaymentMethod(method),
                       ),
-                      if (_paymentMethods.length > 1) IconButton(
-                        icon: Icon(Icons.delete), // Icono para eliminar
-                        onPressed: () => _deletePaymentMethod(method), // Llama a tu función para eliminar
-                      ),
+                      if (_paymentMethods.length > 1)
+                        IconButton(
+                          icon: Icon(Icons.delete), // Icono para eliminar
+                          onPressed: () => _deletePaymentMethod(
+                              method), // Llama a tu función para eliminar
+                        ),
                     ],
                   ),
                 );
@@ -415,25 +455,46 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _returned > 0 
-                ? Text('Cambio: \$$_returned') 
-                : Text('Falta: \$${_returned.abs()}'), // Widget vacío si no cumple la condición
-          ),
-
           // Botón para tomar foto del comprobante
           ElevatedButton.icon(
             onPressed: _takePhoto,
             icon: Icon(Icons.camera_alt),
-            label: Text(_receiptFile != null ? 'Comprobante capturado' : 'Tomar foto del comprobante'),
+            label: Text(_receiptFile != null
+                ? 'Comprobante capturado'
+                : 'Tomar foto del comprobante'),
           ),
 
-          // Botón para completar la venta
-          ElevatedButton(
-            onPressed: _completeSale,
-            child: Text('Confirmar'),
+          const SizedBox(height: 20),
+
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+            //color: Colors.grey[200],
+            child: Column(
+              children: [
+                Text('Total: \$$_totalAmount', style: TextStyle(fontSize: 16)),
+                Text(
+                    _returned > 0
+                        ? 'Cambio: \$$_returned'
+                        : 'Falta: \$${_returned.abs()}',
+                    style: TextStyle(
+                        fontSize: 16,
+                        color:
+                            (_returned > 0) ? Colors.green : Colors.redAccent)),
+                SizedBox(height: 8.0),
+                ElevatedButton.icon(
+                  onPressed: _completeSale,
+                  icon: Icon(Icons.check),
+                  label: Text('Confirmar Venta'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize:
+                        Size.fromHeight(50), // Para que el botón sea más grande
+                  ),
+                ),
+              ],
+            ),
           ),
+
+          const SizedBox(height: 50),
         ],
       ),
     );
