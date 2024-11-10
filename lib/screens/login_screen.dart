@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
+import 'package:hola_mundo/screens/forgot_password_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
 import 'package:http/http.dart' as http;
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('Iniciar sesión'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -99,21 +100,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                decoration: InputDecoration(labelText: 'Usuario'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your username';
+                    return 'Ingrese su nombre de usuario';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: InputDecoration(labelText: 'Constraseña'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Ingrese su contraseña';
                   }
                   return null;
                 },
@@ -121,7 +122,18 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _login,
-                child: Text('Login'),
+                child: Text('Ingresar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ForgotPasswordScreen(),
+                    ),
+                  );
+                },
+                child: Text("¿Ha olvidado su contraseña?"),
               ),
             ],
           ),
