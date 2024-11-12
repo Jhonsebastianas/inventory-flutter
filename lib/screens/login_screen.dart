@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       // Si la respuesta no es 200, muestra un mensaje de error
       setState(() {
-        _errorMessage = 'Invalid username or password';
+        _errorMessage = 'Nombre de usuario o contraseña no válidos';
       });
     }
   }
