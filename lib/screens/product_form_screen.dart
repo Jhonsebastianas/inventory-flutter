@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:provider/provider.dart';
@@ -114,30 +115,29 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
+              CustomTextField(
                 controller: _providerController,
-                decoration:
-                    const InputDecoration(labelText: 'Proveedor (opcional)'),
+                label: 'Proveedor (opcional)',
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomNumberField(
                 controller: _priceController,
-                decoration: const InputDecoration(
-                    labelText: 'Precio de compra (unitario)'),
-                keyboardType: TextInputType.number,
+                label: 'Precio de compra (unitario)',
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomNumberField(
                 controller: _quantityController,
-                decoration: const InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
+                label: 'Cantidad',
               ),
             ],
           ),
           actions: [
-            TextButton(
+            CustomButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancelar'),
+              text: 'Cancelar',
+              type: ButtonType.flat,
             ),
-            ElevatedButton(
+            CustomButton(
               onPressed: () {
                 final provider = _providerController.text;
                 final price = double.tryParse(_priceController.text) ?? 0.0;
@@ -181,7 +181,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
                 Navigator.of(ctx).pop();
               },
-              child: const Text('Guardar'),
+              text: 'Agregar',
+              type: ButtonType.primary,
             ),
           ],
         );
@@ -264,9 +265,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               const SizedBox(height: 20),
               // Botón para añadir detalles de inventario
-              ElevatedButton(
+              CustomButton(
                 onPressed: () => _showStockDetailDialog(),
-                child: const Text('Añadir detalle de inventario'),
+                text: 'Añadir detalle de inventario',
+                type: ButtonType.outline,
               ),
               // Mostrar los detalles del stock en una lista
               // Mostrar los detalles del stock en una lista
@@ -343,10 +345,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-              ElevatedButton(
+              CustomButton(
                 onPressed: _saveForm,
-                child: const Text('Guardar'),
+                text: 'Guardar',
+                type: ButtonType.primary,
               ),
             ],
           ),

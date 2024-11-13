@@ -6,12 +6,12 @@ class CustomNumberField extends StatelessWidget {
   final String? hintText;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
-  final void Function(String?) onSaved;
+  final void Function(String?)? onSaved;
 
   const CustomNumberField({
     Key? key,
     required this.label,
-    required this.onSaved,
+    this.onSaved,
     this.controller,
     this.hintText,
     this.initialValue,

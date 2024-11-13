@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-enum ButtonType { primary, secondary, danger }
+enum ButtonType { primary, secondary, danger, outline, flat }
 
 class CustomButton extends StatelessWidget {
   final String text;
   final ButtonType type;
+  final Icon? icon;
   final VoidCallback onPressed;
   final bool isEnabled;
 
@@ -13,14 +14,16 @@ class CustomButton extends StatelessWidget {
     required this.text,
     required this.type,
     required this.onPressed,
+    this.icon,
     this.isEnabled = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Estilos según el tipo de botón
+    // Definición de colores y estilos de acuerdo al tipo de botón
     Color backgroundColor;
     Color textColor;
+    BorderSide borderStyle = BorderSide.none;
 
     switch (type) {
       case ButtonType.primary:
@@ -35,6 +38,15 @@ class CustomButton extends StatelessWidget {
         backgroundColor = Colors.red;
         textColor = Colors.white;
         break;
+      case ButtonType.outline:
+        backgroundColor = Colors.transparent;
+        textColor = Colors.blue;
+        borderStyle = BorderSide(color: Colors.blue, width: 2);
+        break;
+      case ButtonType.flat:
+        backgroundColor = Colors.transparent;
+        textColor = Colors.blue;
+        break;
       default:
         backgroundColor = Colors.blue;
         textColor = Colors.white;
@@ -46,13 +58,16 @@ class CustomButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
+          side: borderStyle,
         ),
+        elevation: (type == ButtonType.flat || type == ButtonType.outline) ? 0 : 2,
+        shadowColor: (type == ButtonType.flat || type == ButtonType.outline) ? Colors.transparent : null,
       ),
       onPressed: isEnabled ? onPressed : null,
       child: Text(
         text,
         style: TextStyle(
-          color: textColor,
+          color: isEnabled ? textColor : Colors.grey.shade600,
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),

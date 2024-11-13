@@ -2,6 +2,9 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/models/file_dto.dart';
 import 'package:hola_mundo/services/sale_service.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
 import 'package:hola_mundo/models/product.dart';
 import 'dart:io';
@@ -87,20 +90,20 @@ class _SalesScreenState extends State<SalesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              const SizedBox(height: 20),
+              CustomNumberField(
                 controller: priceController,
-                decoration: InputDecoration(labelText: 'Precio'),
-                keyboardType: TextInputType.number,
+                label: 'Precio',
               ),
-              TextField(
+              const SizedBox(height: 20),
+              CustomNumberField(
                 controller: quantityController,
-                decoration: InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
+                label: 'Cantidad',
               ),
             ],
           ),
           actions: [
-            TextButton(
+            CustomButton(
               onPressed: () {
                 setState(() {
                   product.price = double.parse(priceController.text);
@@ -109,7 +112,8 @@ class _SalesScreenState extends State<SalesScreen> {
                 _updateTotal();
                 Navigator.pop(context);
               },
-              child: Text('Confirmar'),
+              text: 'Confirmar',
+              type: ButtonType.outline,
             ),
           ],
         );
