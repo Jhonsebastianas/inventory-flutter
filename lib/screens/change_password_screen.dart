@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
-class ChangePasswordScreen extends StatelessWidget {
-  final String email;
-  ChangePasswordScreen({required this.email});
+
+class ChangePasswordScreen extends StatefulWidget {
+  @override
+  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();

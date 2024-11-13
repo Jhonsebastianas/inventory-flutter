@@ -51,8 +51,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => OtpScreen(email: _emailController.text)),
+            MaterialPageRoute(builder: (context) => OtpScreen()),
           );
         } else {
           var jsonResponse = jsonDecode(response.body);
@@ -106,7 +105,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _sendOtp,
-                  child: Text("Enviar código de seguridad (OTP)"),
+                  child: Text("Enviar código de verificación"),
                 ),
               ],
             ),
