@@ -79,6 +79,11 @@ class _OtpScreenState extends State<OtpScreen> {
             context,
             MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
           );
+        } else {
+          var jsonResponse = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${jsonResponse['message']}')),
+          );
         }
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
