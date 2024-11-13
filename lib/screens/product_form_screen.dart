@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
 import '../models/product.dart';
@@ -200,9 +202,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
+              SizedBox(height: 20),
+              CustomTextField(
                 initialValue: _name,
-                decoration: const InputDecoration(labelText: 'Nombre'),
+                label: 'Nombre',
                 onSaved: (value) {
                   _name = value!;
                 },
@@ -213,18 +216,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   return null;
                 },
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomTextField(
                 initialValue: _description,
-                decoration:
-                    const InputDecoration(labelText: 'Descripción (opcional)'),
+                label: 'Descripción (opcional)',
                 onSaved: (value) {
                   _description = value!;
                 },
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomNumberField(
                 initialValue: _price.toString(),
-                decoration: const InputDecoration(labelText: 'Precio de venta'),
-                keyboardType: TextInputType.number,
+                label: 'Precio de venta',
                 onSaved: (value) {
                   _price = double.parse(value!);
                 },
@@ -235,10 +238,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   return null;
                 },
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomNumberField(
                 initialValue: _percentageTax.toString(),
-                decoration: const InputDecoration(labelText: 'IVA (opcional)'),
-                keyboardType: TextInputType.number,
+                label: 'IVA (opcional)',
                 onSaved: (value) {
                   _percentageTax = double.parse(value!);
                 },

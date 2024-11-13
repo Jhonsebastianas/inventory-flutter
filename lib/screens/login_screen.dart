@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
 import 'package:hola_mundo/screens/forgot_password_screen.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
 import 'package:http/http.dart' as http;
@@ -98,9 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   _errorMessage!,
                   style: TextStyle(color: Colors.red),
                 ),
-              TextFormField(
+              CustomTextField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Usuario'),
+                label: 'Usuario',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Ingrese su nombre de usuario';
@@ -108,9 +109,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              TextFormField(
+              SizedBox(height: 20),
+              CustomTextField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Constraseña'),
+                label: 'Contraseña',
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
