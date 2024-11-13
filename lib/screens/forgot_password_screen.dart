@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'otp_screen.dart';
 import 'package:http/http.dart' as http;
@@ -91,9 +93,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     _errorMessage!,
                     style: TextStyle(color: Colors.red),
                   ),
-                TextFormField(
+                CustomTextField(
                   controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Correo electrónico'),
+                  label: 'Correo electrónico',
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -103,9 +105,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
+                CustomButton(
                   onPressed: _sendOtp,
-                  child: Text("Enviar código de verificación"),
+                  text: "Enviar código de verificación",
+                  type: ButtonType.primary,
                 ),
               ],
             ),

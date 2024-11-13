@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
 import 'package:hola_mundo/screens/forgot_password_screen.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
@@ -122,9 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(
+              CustomButton(
                 onPressed: _login,
-                child: Text('Ingresar'),
+                text: 'Ingresar',
+                type: ButtonType.primary,
               ),
               TextButton(
                 onPressed: () {
