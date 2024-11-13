@@ -1,3 +1,4 @@
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/models/file_dto.dart';
 import 'package:hola_mundo/services/sale_service.dart';
@@ -6,7 +7,7 @@ import 'package:hola_mundo/models/product.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:hola_mundo/models/sale.dart';
-import 'package:hola_mundo/providers/product_provider.dart'; // Ajusta el import a tu estructura de carpetas
+import 'package:hola_mundo/providers/product_provider.dart';
 
 class SalesScreen extends StatefulWidget {
   @override
@@ -331,29 +332,29 @@ class _SalesScreenState extends State<SalesScreen> {
       body: Column(
         children: [
           // Barra de búsqueda con fondo
+          // Dentro de la AnimatedContainer para la barra de búsqueda
           AnimatedContainer(
             duration: Duration(milliseconds: 300),
             padding: EdgeInsets.all(8.0),
-            //color: Colors.grey[200],
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      labelText: 'Buscar producto',
-                      hintText: 'Ingresa el nombre del producto',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: _searchProduct,
-                    onTap: () {
+                  child: CustomDropdown.search(
+                    searchHintText: 'Buscar producto',
+                    hintText: 'Buscar producto',
+                    items: filteredProducts
+                        .map((product) => product.name)
+                        .toList(),
+                    onChanged: (value) {
+                      // Busca el producto seleccionado en filteredProducts
+                      final selectedProduct = filteredProducts.firstWhere(
+                        (product) => product.name == value,
+                      );
+                      if (selectedProduct != null) {
+                        _selectProduct(selectedProduct);
+                      }
                       setState(() {
-                        _isSearching = true;
+                        _isSearching = false; // Cierra la búsqueda
                       });
                     },
                   ),
