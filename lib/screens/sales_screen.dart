@@ -536,14 +536,6 @@ class _SalesScreenState extends State<SalesScreen> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      CustomButton(
-                        onPressed: _completeSale,
-                        text: 'Confirmar Venta (' +
-                            _totalAmount.toString() +
-                            ' COP)',
-                        type: ButtonType.primary,
-                        minimumSize: const Size(double.infinity, 48),
-                      ),
                     ],
                   ),
                 ),
@@ -551,6 +543,17 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        height: 50,
+        margin: const EdgeInsets.all(10),
+        child: CustomButton(
+          onPressed: _completeSale,
+          text: 'Confirmar Venta (' + _totalAmount.toString() + ' COP)',
+          type: ButtonType.primary,
+          minimumSize: const Size(double.infinity, 48),
+        ),
       ),
     );
   }
