@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
 import 'package:hola_mundo/screens/login_screen.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
+import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -17,11 +19,29 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String? _token;
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _passwordFocusNode = FocusNode(); // FocusNode para la nueva contraseña
+
+  bool hasUppercase = false;
+  bool hasDigits = false;
+  bool hasSpecialCharacters = false;
+  bool hasMinLength = false;
+  bool showRequirements = false; // Variable para mostrar/ocultar requisitos
 
   @override
   void initState() {
     super.initState();
     _loadRecoverInfo();
+
+// Escucha cambios en el controlador de la contraseña
+    _passwordController.addListener(() {
+      _validatePassword(_passwordController.text);
+    });
+    // Listener para mostrar requisitos solo cuando el campo tiene el foco
+    _passwordFocusNode.addListener(() {
+      setState(() {
+        showRequirements = _passwordFocusNode.hasFocus;
+      });
+    });
   }
 
   Future<void> _loadRecoverInfo() async {
@@ -85,9 +105,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   // Función de validación de la contraseña
   String? _validatePassword(String? password) {
+    setState(() {
+      hasUppercase = password!.contains(RegExp(r'[A-Z]'));
+      hasDigits = password.contains(RegExp(r'[0-9]'));
+      hasSpecialCharacters =
+          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+      hasMinLength = password.length >= 8;
+    });
     if (password == null || password.isEmpty) {
       return 'La contraseña no puede estar vacía';
     }
+
     if (password.length < 8) {
       return 'La contraseña debe tener al menos 8 caracteres';
     }
@@ -106,56 +134,145 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Cambiar contraseña"),
-      ),
-      body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(labelText: 'Contraseña nueva'),
-                  obscureText: true,
-                  validator: _validatePassword
-                ),
-                // Agrega las instrucciones de ayuda aquí
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    'La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, '
-                    'un número y un carácter especial.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                    textAlign: TextAlign.start,
+        appBar: AppBar(
+          title: const Text(
+            "Cambiar contraseña",
+            style: TextStyle(color: Color(0xFF757575)),
+          ),
+        ),
+        body: SafeArea(
+            child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SingleChildScrollView(
+                  child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Nueva contraseña",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  decoration:
-                      InputDecoration(labelText: 'Confirmar nueva contraseña'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor confirma la contraseña';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Las contraseñas no coinciden';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                
-                ElevatedButton(
-                  onPressed: () => _changePassword(context),
-                  child: Text("Cambiar contraseña"),
-                ),
-              ],
-            ),
-          )),
-    );
+                  const SizedBox(height: 8),
+                  const Text('Ingrese su nueva contraseña'),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomTextField(
+                          controller: _passwordController,
+                          label: 'Contraseña nueva',
+                          obscureText: true,
+                          validator: _validatePassword,
+                          focusNode: _passwordFocusNode, // Asigna el FocusNode
+                        ),
+                        // Agrega las instrucciones de ayuda aquí
+                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
+                        if (showRequirements) ...[
+                          // Mostrar requisitos solo cuando showRequirements es true
+                          const Row(
+                            children: [
+                              Text(
+                                'La contraseña debe tener al menos:',
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          _buildRequirement(
+                              'Al menos 8 caracteres', hasMinLength),
+                          _buildRequirement(
+                              'Una letra mayúscula', hasUppercase),
+                          _buildRequirement('Un número', hasDigits),
+                          _buildRequirement(
+                              'Un carácter especial', hasSpecialCharacters),
+                        ],
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          controller: _confirmPasswordController,
+                          label: 'Confirmar nueva contraseña',
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor confirma la contraseña';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Las contraseñas no coinciden';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 50),
+                        CustomButton(
+                          onPressed: () => _changePassword(context),
+                          text: 'Cambiar contraseña',
+                          type: ButtonType.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                ],
+              ))),
+        )));
   }
 }
+
+Widget _buildRequirement(String text, bool isValid) {
+  return Row(
+    children: [
+      Icon(
+        isValid ? Icons.check_circle : Icons.cancel,
+        color: isValid ? Colors.green : Colors.red,
+        size: 18,
+      ),
+      const SizedBox(width: 8),
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          color: isValid ? Colors.green : Colors.grey,
+        ),
+      ),
+    ],
+  );
+}
+
+// class NoAccountText extends StatelessWidget {
+//   const NoAccountText({
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         const Text(
+//           "¿No tienes una cuenta? ",
+//           style: TextStyle(color: Color(0xFF757575)),
+//         ),
+//         GestureDetector(
+//           onTap: () {
+//             // Handle navigation to Sign Up
+//           },
+//           child: const Text(
+//             "Regístrate",
+//             style: TextStyle(
+//               color: Colors.blue,
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }

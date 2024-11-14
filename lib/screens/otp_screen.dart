@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hola_mundo/config/api_config.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'change_password_screen.dart';
 import 'package:http/http.dart' as http;
@@ -91,12 +92,6 @@ class _OtpScreenState extends State<OtpScreen> {
         );
       }
     }
-    // Aquí iría la lógica para verificar el OTP ingresado
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //       builder: (context) => ChangePasswordScreen(email: _email)),
-    // );
   }
 
   @override
@@ -108,62 +103,137 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
-  void _resendOtp() {
-    // Lógica para reenviar el OTP
+  void _resendOtp() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final response = await http.post(
+          Uri.parse('$baseUrl/login/sendVerificationCodeRecoverAccount'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'email': _email ?? '',
+          }),
+        );
+
+        if (response.statusCode == 201) {
+          // Si la respuesta es exitosa, procesa el token
+          var jsonResponse = jsonDecode(response.body);
+          String token = jsonResponse['data']['token'];
+          String email = jsonResponse['data']['email'];
+
+          // Aquí puedes guardar el token en la aplicación
+          await _saveSession(token, email);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${jsonResponse['message']}')),
+          );
+        } else {
+          var jsonResponse = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${jsonResponse['message']}')),
+          );
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $error')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Ingresar OTP"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Código de verificación (OTP) ha sido enviado a ${_email}"),
-            Form(
-                key: _formKey,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildOtpBox(context, "pin1", _pin1Controller),
-                    _buildOtpBox(context, "pin2", _pin2Controller),
-                    _buildOtpBox(context, "pin3", _pin3Controller),
-                    _buildOtpBox(context, "pin4", _pin4Controller),
-                  ],
-                )),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _verifyOtp(context),
-              child: Text("Verificar"),
-            ),
-            TextButton(
-              onPressed: _resendOtp,
-              child: Text("Volver a enviar código de verificación (OTP)"),
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text(
+            "Verificación OTP",
+            style: TextStyle(color: Color(0xFF757575)),
+          ),
         ),
-      ),
-    );
+        body: SafeArea(
+            child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Verificación OTP",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                        "Enviamos su código de verificación a ${_email} \n\n Este código caducará en 5 minutos",
+                        textAlign: TextAlign.center),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildOtpBox(context, "pin1", _pin1Controller),
+                              _buildOtpBox(context, "pin2", _pin2Controller),
+                              _buildOtpBox(context, "pin3", _pin3Controller),
+                              _buildOtpBox(context, "pin4", _pin4Controller),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          CustomButton(
+                            onPressed: () => _verifyOtp(context),
+                            text: 'Continuar',
+                            type: ButtonType.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                    CustomButton(
+                      onPressed: _resendOtp,
+                      text: 'Volver a enviar código de verificación',
+                      type: ButtonType.flat,
+                    ),
+                  ],
+                ),
+              )),
+        )));
   }
 
   Widget _buildOtpBox(BuildContext context, String fieldName,
       TextEditingController _pinController) {
+    const authOutlineInputBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0xFF757575)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
+    );
+
     return SizedBox(
       height: 68,
       width: 64,
       child: TextFormField(
         controller: _pinController,
-        onSaved: (pin1) {},
+        onSaved: (pin) {},
         onChanged: (value) {
-          if (value.length == 1) {
+          if (value.isNotEmpty) {
             FocusScope.of(context).nextFocus();
           }
         },
-        decoration: InputDecoration(hintText: "0"),
+        textInputAction: TextInputAction.next,
+        decoration: InputDecoration(
+            hintText: "0",
+            hintStyle: const TextStyle(color: Color(0xFF757575)),
+            border: authOutlineInputBorder,
+            enabledBorder: authOutlineInputBorder,
+            focusedBorder: authOutlineInputBorder.copyWith(
+                borderSide: const BorderSide(color: Colors.blue))),
         style: Theme.of(context).textTheme.headlineLarge,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
