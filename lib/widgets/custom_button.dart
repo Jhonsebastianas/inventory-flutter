@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ButtonType { primary, secondary, danger, outline, flat }
+enum ButtonType { primary, secondary, danger, outline, flat, flatDanger }
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -49,6 +49,10 @@ class CustomButton extends StatelessWidget {
         backgroundColor = Colors.transparent;
         textColor = Colors.blue;
         break;
+      case ButtonType.flatDanger:
+        backgroundColor = Colors.transparent;
+        textColor = Colors.red;
+        break;
       default:
         backgroundColor = Colors.blue;
         textColor = Colors.white;
@@ -62,8 +66,8 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           side: borderStyle,
         ),
-        elevation: (type == ButtonType.flat || type == ButtonType.outline) ? 0 : 2,
-        shadowColor: (type == ButtonType.flat || type == ButtonType.outline) ? Colors.transparent : null,
+        elevation: (type == ButtonType.flat || type == ButtonType.outline || type == ButtonType.flatDanger) ? 0 : 2,
+        shadowColor: (type == ButtonType.flat || type == ButtonType.outline || type == ButtonType.flatDanger) ? Colors.transparent : null,
         minimumSize: minimumSize,
       ),
       onPressed: isEnabled ? onPressed : null,

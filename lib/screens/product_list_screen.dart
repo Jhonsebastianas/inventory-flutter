@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/models/product.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../providers/product_provider.dart';
@@ -134,84 +135,156 @@ class ProductTile extends StatelessWidget {
     this.onDelete,
   }) : super(key: key);
 
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirmación'),
+        content: const Text('¿Estás seguro de que deseas eliminar este producto?'),
+        actions: [
+          CustomButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            type: ButtonType.flat,
+            text: 'Cancelar',
+          ),
+          CustomButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (onDelete != null) {
+                onDelete!();
+              }
+            },
+            type: ButtonType.flatDanger,
+            text: 'Eliminar',
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+    return Dismissible(
+      key: ValueKey(product.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        color: Colors.red.shade200,
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+          size: 30,
+        ),
       ),
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              // Imagen de Producto o un Placeholder
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade200,
-                ),
-                child: Icon(
-                  Icons.inventory_2,
-                  color: Colors.grey.shade600,
-                  size: 40,
-                ),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Confirmación'),
+            content: const Text('¿Estás seguro de que deseas eliminar este producto?'),
+            actions: [
+              CustomButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                type: ButtonType.flat,
+                text: 'Cancelar',
               ),
-              const SizedBox(width: 16),
-              
-              // Información del Producto
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      product.description,
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$${product.price.toStringAsFixed(2)} • IVA: ${product.percentageTax}%',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Existencias: ${product.stock}',
-                      style: TextStyle(
-                        color: product.stock > 0 ? Colors.green : Colors.red,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Botón de Eliminar
-              IconButton(
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red.shade300,
-                ),
-                onPressed: onDelete,
+              CustomButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop(true);
+                  if (onDelete != null) {
+                    onDelete!();
+                  }
+                },
+                type: ButtonType.flatDanger,
+                text: 'Eliminar',
               ),
             ],
+          ),
+        );
+      },
+      onDismissed: (direction) {
+        if (onDelete != null) {
+          onDelete!();
+        }
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(15),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                // Imagen de Producto o un Placeholder
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade200,
+                  ),
+                  child: Icon(
+                    Icons.inventory_2,
+                    color: Colors.grey.shade600,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                
+                // Información del Producto
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        product.description,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${product.price.toStringAsFixed(2)} • IVA: ${product.percentageTax}%',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Existencias: ${product.stock}',
+                        style: TextStyle(
+                          color: product.stock > 0 ? Colors.green : Colors.red,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Botón de Eliminar
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red.shade300,
+                  ),
+                  onPressed: () => _showDeleteConfirmation(context),
+                ),
+              ],
+            ),
           ),
         ),
       ),
