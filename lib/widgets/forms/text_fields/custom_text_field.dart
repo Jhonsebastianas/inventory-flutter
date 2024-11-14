@@ -80,10 +80,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
                           semanticLabel:
                               'Text to announce in accessibility modes',
                         ),
-                  // child: SvgPicture.string(
-                  //   isPasswordVisible ? openLockIcon : closedLockIcon,
-                  //   color: Colors.grey,
-                  // ),
                 ),
               )
             : null,

@@ -4,7 +4,6 @@ import 'package:hola_mundo/models/file_dto.dart';
 import 'package:hola_mundo/services/sale_service.dart';
 import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
 import 'package:hola_mundo/models/product.dart';
 import 'dart:io';
@@ -86,7 +85,7 @@ class _SalesScreenState extends State<SalesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Editar Producto'),
+          title: const Text('Editar Producto'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -113,7 +112,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 Navigator.pop(context);
               },
               text: 'Confirmar',
-              type: ButtonType.outline,
+              type: ButtonType.flat,
             ),
           ],
         );
@@ -122,10 +121,10 @@ class _SalesScreenState extends State<SalesScreen> {
   }
 
   void _editPaymentMethod(PaymentMethod paymentMethod) {
-    TextEditingController typeController =
-        TextEditingController(text: paymentMethod.type);
     TextEditingController amountController =
         TextEditingController(text: paymentMethod.amount.toString());
+    String? selectedPaymentType =
+        paymentMethod.type; // Variable de estado para el tipo de pago
 
     showDialog(
       context: context,
@@ -135,62 +134,9 @@ class _SalesScreenState extends State<SalesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: typeController,
-                decoration: InputDecoration(labelText: 'Forma de pago'),
-              ),
-              TextField(
-                controller: amountController,
-                decoration: InputDecoration(labelText: 'Monto'),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  paymentMethod.type = typeController.text;
-                  paymentMethod.amount = double.parse(amountController.text);
-                  _updateTotal();
-                });
-                Navigator.pop(context);
-              },
-              child: Text('Confirmar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deletePaymentMethod(PaymentMethod paymentMethod) {
-    setState(() {
-      _paymentMethods
-          .removeWhere((method) => method.type == paymentMethod.type);
-    });
-    if (_paymentMethods.length == 1) {
-      _updateTotal();
-    }
-  }
-
-  // Método para añadir un método de pago
-  void _addPaymentMethod() {
-    TextEditingController typeController = TextEditingController();
-    String? selectedPaymentType; // Variable de estado para el tipo de pago
-    TextEditingController amountController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Añadir método de pago'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
               DropdownButtonFormField<String>(
                 value: selectedPaymentType,
-                decoration: InputDecoration(labelText: 'Forma de pago'),
+                decoration: const InputDecoration(labelText: 'Forma de pago'),
                 items: [
                   DropdownMenuItem(
                     child: Text('Efectivo'),
@@ -218,7 +164,84 @@ class _SalesScreenState extends State<SalesScreen> {
               ),
               TextField(
                 controller: amountController,
-                decoration: InputDecoration(labelText: 'Monto'),
+                decoration: const InputDecoration(labelText: 'Monto'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            CustomButton(
+              onPressed: () {
+                setState(() {
+                  paymentMethod.type = selectedPaymentType.toString();
+                  paymentMethod.amount = double.parse(amountController.text);
+                  _updateTotal();
+                });
+                Navigator.pop(context);
+              },
+              text: 'Confirmar',
+              type: ButtonType.flat,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deletePaymentMethod(PaymentMethod paymentMethod) {
+    setState(() {
+      _paymentMethods
+          .removeWhere((method) => method.type == paymentMethod.type);
+    });
+    if (_paymentMethods.length == 1) {
+      _updateTotal();
+    }
+  }
+
+  // Método para añadir un método de pago
+  void _addPaymentMethod() {
+    String? selectedPaymentType; // Variable de estado para el tipo de pago
+    TextEditingController amountController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Añadir método de pago'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedPaymentType,
+                decoration: const InputDecoration(labelText: 'Forma de pago'),
+                items: [
+                  DropdownMenuItem(
+                    child: Text('Efectivo'),
+                    value: 'Efectivo',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Transferencia'),
+                    value: 'Transferencia',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Tarjeta'),
+                    value: 'Tarjeta',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Otro'),
+                    value: 'Otro',
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedPaymentType =
+                        value; // Actualiza el estado con el tipo de pago seleccionado
+                  });
+                },
+              ),
+              TextField(
+                controller: amountController,
+                decoration: const InputDecoration(labelText: 'Monto'),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -237,7 +260,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 });
                 Navigator.pop(context);
               },
-              child: Text('Confirmar'),
+              child: const Text('Confirmar'),
             ),
           ],
         );
@@ -325,7 +348,7 @@ class _SalesScreenState extends State<SalesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtenemos el ProductProvider para acceder a los productos filtrados
+    bool _customTileExpanded = false;
     var productProvider = Provider.of<ProductProvider>(context);
     var filteredProducts = productProvider.filteredProducts;
 
@@ -336,7 +359,6 @@ class _SalesScreenState extends State<SalesScreen> {
       body: Column(
         children: [
           // Barra de búsqueda con fondo
-          // Dentro de la AnimatedContainer para la barra de búsqueda
           AnimatedContainer(
             duration: Duration(milliseconds: 300),
             padding: EdgeInsets.all(8.0),
@@ -350,7 +372,6 @@ class _SalesScreenState extends State<SalesScreen> {
                         .map((product) => product.name)
                         .toList(),
                     onChanged: (value) {
-                      // Busca el producto seleccionado en filteredProducts
                       final selectedProduct = filteredProducts.firstWhere(
                         (product) => product.name == value,
                       );
@@ -377,131 +398,204 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
           ),
 
-          // Muestra los productos filtrados solo si _isSearching es verdadero
-          if (_isSearching)
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredProducts.length,
-                itemBuilder: (context, index) {
-                  final product = filteredProducts[index];
-                  return ListTile(
-                    title: Text(product.name),
-                    subtitle: Text('Precio: \$${product.price}'),
-                    onTap: () => _selectProduct(product),
-                  );
-                },
-              ),
-            ),
-
-          // Lista de productos seleccionados
           Expanded(
-            child: ListView.builder(
-              itemCount: _selectedProducts.length,
-              itemBuilder: (context, index) {
-                final product = _selectedProducts[index];
-                return ListTile(
-                  title: Text(product.name),
-                  subtitle: Text(
-                      '\$${product.price} - Cantidad: ${product.quantity}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize
-                        .min, // Para que el Row no ocupe todo el ancho
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _editProduct(product),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete), // Icono para eliminar
-                        onPressed: () => _deleteProduct(
-                            product), // Llama a tu función para eliminar
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Botón para añadir método de pago
-          ElevatedButton.icon(
-            onPressed: _addPaymentMethod,
-            icon: Icon(Icons.payment),
-            label: Text('Añadir método de pago'),
-          ),
-
-          // Lista de métodos de pago
-          Expanded(
-            child: ListView.builder(
-              itemCount: _paymentMethods.length,
-              itemBuilder: (context, index) {
-                final method = _paymentMethods[index];
-                return ListTile(
-                  title: Text('${method.type}'),
-                  subtitle: Text('\$${method.amount}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize
-                        .min, // Para que el Row no ocupe todo el ancho
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _editPaymentMethod(method),
-                      ),
-                      if (_paymentMethods.length > 1)
-                        IconButton(
-                          icon: Icon(Icons.delete), // Icono para eliminar
-                          onPressed: () => _deletePaymentMethod(
-                              method), // Llama a tu función para eliminar
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Botón para tomar foto del comprobante
-          ElevatedButton.icon(
-            onPressed: _takePhoto,
-            icon: Icon(Icons.camera_alt),
-            label: Text(_receiptFile != null
-                ? 'Comprobante capturado'
-                : 'Tomar foto del comprobante'),
-          ),
-
-          const SizedBox(height: 20),
-
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-            //color: Colors.grey[200],
-            child: Column(
+            child: ListView(
               children: [
-                Text('Total: \$$_totalAmount', style: TextStyle(fontSize: 16)),
-                Text(
-                    _returned > 0
-                        ? 'Cambio: \$$_returned'
-                        : 'Falta: \$${_returned.abs()}',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color:
-                            (_returned > 0) ? Colors.green : Colors.redAccent)),
-                SizedBox(height: 8.0),
-                ElevatedButton.icon(
-                  onPressed: _completeSale,
-                  icon: Icon(Icons.check),
-                  label: Text('Confirmar Venta'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize:
-                        Size.fromHeight(50), // Para que el botón sea más grande
+                // Sección de Productos
+                ExpansionTile(
+                  title: NumOfItems(
+                    numOfItem: _selectedProducts.length,
+                    title: 'Productos',
+                  ),
+                  //title: Text("${_selectedProducts.length} - Productos"),
+                  initiallyExpanded: true,
+                  children: [
+                    if (_isSearching)
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+                          return ListTile(
+                            title: Text(product.name),
+                            subtitle: Text('Precio: \$${product.price}'),
+                            onTap: () => _selectProduct(product),
+                          );
+                        },
+                      ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _selectedProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = _selectedProducts[index];
+
+                        return ListTile(
+                          title: Text(product.name),
+                          subtitle: Text(
+                            '\$${product.price} - Cantidad: ${product.quantity}',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _editProduct(product),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteProduct(product),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+
+                // Sección de Métodos de Pago
+                ExpansionTile(
+                  title: NumOfItems(
+                    numOfItem: _paymentMethods.length,
+                    title: 'Métodos de Pago',
+                  ),
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _paymentMethods.length,
+                      itemBuilder: (context, index) {
+                        final method = _paymentMethods[index];
+                        return ListTile(
+                          title: Text('${method.type}'),
+                          subtitle: Text('\$${method.amount}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _editPaymentMethod(method),
+                              ),
+                              if (_paymentMethods.length > 1)
+                                IconButton(
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () => _deletePaymentMethod(method),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    CustomButton(
+                      text: 'Añadir método de pago',
+                      type: ButtonType.flat,
+                      onPressed: _addPaymentMethod,
+                      icon: const Icon(
+                        Icons.payment,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                  ],
+                ),
+
+                // Sección de Comprobante
+                ExpansionTile(
+                  title: NumOfItems(
+                    numOfItem: _receiptFile != null ? 1 : 0,
+                    title: 'Comprobante',
+                  ),
+                  children: [
+                    CustomButton(
+                      text: _receiptFile != null
+                          ? 'Comprobante capturado'
+                          : 'Tomar foto del comprobante',
+                      type: ButtonType.flat,
+                      onPressed: _takePhoto,
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                  child: Column(
+                    children: [
+                      Text('Total: \$$_totalAmount',
+                          style: const TextStyle(fontSize: 16)),
+                      Text(
+                        _returned > 0
+                            ? 'Cambio: \$$_returned'
+                            : 'Falta: \$${_returned.abs()}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color:
+                              (_returned > 0) ? Colors.green : Colors.redAccent,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      CustomButton(
+                        onPressed: _completeSale,
+                        text: 'Confirmar Venta (' +
+                            _totalAmount.toString() +
+                            ' COP)',
+                        type: ButtonType.primary,
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 50),
         ],
       ),
+    );
+  }
+}
+
+class NumOfItems extends StatelessWidget {
+  const NumOfItems({
+    super.key,
+    required this.numOfItem,
+    required this.title,
+  });
+
+  final int numOfItem;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 24,
+              width: 24,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
+                border: Border.all(
+                    width: 0.5,
+                    color: const Color(0xFF868686).withOpacity(0.3)),
+              ),
+              child: Text(
+                numOfItem.toString(),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge!
+                    .copyWith(color: Colors.blueAccent),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+          ],
+        )
+      ],
     );
   }
 }

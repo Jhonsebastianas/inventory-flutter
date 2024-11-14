@@ -43,6 +43,7 @@ class Sale {
 class SaleProduct {
   final String id;
   final String name;
+  final String? description;
   double price;
   int quantity;
 
@@ -70,6 +71,7 @@ class SaleProduct {
     required this.name,
     required this.price,
     required this.quantity,
+    this.description
   });
 }
 

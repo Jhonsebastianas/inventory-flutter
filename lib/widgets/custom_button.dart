@@ -67,13 +67,22 @@ class CustomButton extends StatelessWidget {
         minimumSize: minimumSize,
       ),
       onPressed: isEnabled ? onPressed : null,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isEnabled ? textColor : Colors.grey.shade600,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            icon!,
+            const SizedBox(width: 8), // Espacio entre el icono y el texto
+          ],
+          Text(
+            text,
+            style: TextStyle(
+              color: isEnabled ? textColor : Colors.grey.shade600,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }
