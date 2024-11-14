@@ -8,6 +8,7 @@ class CustomButton extends StatelessWidget {
   final Icon? icon;
   final VoidCallback onPressed;
   final bool isEnabled;
+  final Size? minimumSize;
 
   const CustomButton({
     Key? key,
@@ -15,6 +16,7 @@ class CustomButton extends StatelessWidget {
     required this.type,
     required this.onPressed,
     this.icon,
+    this.minimumSize,
     this.isEnabled = true,
   }) : super(key: key);
 
@@ -62,6 +64,7 @@ class CustomButton extends StatelessWidget {
         ),
         elevation: (type == ButtonType.flat || type == ButtonType.outline) ? 0 : 2,
         shadowColor: (type == ButtonType.flat || type == ButtonType.outline) ? Colors.transparent : null,
+        minimumSize: minimumSize,
       ),
       onPressed: isEnabled ? onPressed : null,
       child: Text(
