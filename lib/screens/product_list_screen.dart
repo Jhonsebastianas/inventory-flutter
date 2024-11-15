@@ -57,14 +57,14 @@ class ProductListScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             width: MediaQuery.of(context).size.width * 0.6,
-                            height: 20,
+                            height: 65,
                             color: Colors.white,
                           ),
                           const SizedBox(height: 8),
