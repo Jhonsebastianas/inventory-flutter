@@ -340,9 +340,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ExpansionTile(
                     title: Text(
                       'Detalles de existencias',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     children: _stockDetails.map((stockDetail) {
                       final index = _stockDetails.indexOf(stockDetail);

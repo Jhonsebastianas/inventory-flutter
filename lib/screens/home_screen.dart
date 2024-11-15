@@ -216,32 +216,6 @@ class ProductScreen extends StatelessWidget {
                 );
               },
             ),
-            _buildCard(
-              context,
-              title: 'Modificar Producto',
-              icon: Icons.edit,
-              color: Colors.orange,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ProductListScreen(),
-                  ),
-                );
-              },
-            ),
-            _buildCard(
-              context,
-              title: 'Eliminar Producto',
-              icon: Icons.delete,
-              color: Colors.red,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ProductListScreen(),
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),
