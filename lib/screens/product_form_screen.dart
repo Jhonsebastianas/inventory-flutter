@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hola_mundo/widgets/custom_button.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
@@ -34,7 +35,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _stock = widget.product!.stock;
       _percentageTax = widget.product!.percentageTax;
       _stockDetails = widget.product!.stockDetails;
-      _weightedAveragePurchasePrice = widget.product!.weightedAveragePurchasePrice;
+      _weightedAveragePurchasePrice =
+          widget.product!.weightedAveragePurchasePrice;
     } else {
       _name = '';
       _description = '';
@@ -190,6 +192,38 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
+  void _confirmDeleteDetail(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Eliminar Detalle'),
+          content: const Text(
+            '¿Estás seguro de que deseas eliminar este detalle del inventario?',
+          ),
+          actions: [
+            CustomButton(
+              onPressed: () => Navigator.of(context).pop(),
+              type: ButtonType.flat,
+              text: 'Cancelar',
+            ),
+            CustomButton(
+              onPressed: () {
+                setState(() {
+                  _stockDetails.removeAt(index);
+                  updateStock();
+                });
+                Navigator.of(context).pop();
+              },
+              type: ButtonType.flatDanger,
+              text: 'Eliminar',
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -197,162 +231,227 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         title: Text(
             widget.product == null ? 'Agregar Producto' : 'Editar Producto'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(height: 20),
-              CustomTextField(
-                initialValue: _name,
-                label: 'Nombre',
-                onSaved: (value) {
-                  _name = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese un nombre.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              CustomTextField(
-                initialValue: _description,
-                label: 'Descripción (opcional)',
-                onSaved: (value) {
-                  _description = value!;
-                },
-              ),
-              SizedBox(height: 20),
-              CustomNumberField(
-                initialValue: _price.toString(),
-                label: 'Precio de venta',
-                onSaved: (value) {
-                  _price = double.parse(value!);
-                },
-                validator: (value) {
-                  if (value == null || double.tryParse(value) == null) {
-                    return 'Por favor ingrese un precio válido.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              CustomNumberField(
-                initialValue: _percentageTax.toString(),
-                label: 'IVA (opcional)',
-                onSaved: (value) {
-                  _percentageTax = double.parse(value!);
-                },
-                validator: (value) {
-                  if (value == null || double.tryParse(value) == null) {
-                    return 'Por favor ingrese un precio válido.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'En inventario: $_stock',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Precio promedio ponderado: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              // Botón para añadir detalles de inventario
-              CustomButton(
-                onPressed: () => _showStockDetailDialog(),
-                text: 'Añadir detalle de inventario',
-                type: ButtonType.outline,
-              ),
-              // Mostrar los detalles del stock en una lista
-              // Mostrar los detalles del stock en una lista
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _stockDetails.length,
-                  itemBuilder: (context, index) {
-                    final stockDetail = _stockDetails[index];
-                    return Card(
-                      elevation: 2,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Información del Producto',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  initialValue: _name,
+                  label: 'Nombre del Producto',
+                  onSaved: (value) => _name = value!,
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                      return 'Por favor ingrese un nombre.';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  initialValue: _description,
+                  label: 'Descripción (opcional)',
+                  onSaved: (value) => _description = value!,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomNumberField(
+                        initialValue: _price.toString(),
+                        label: 'Precio de Venta',
+                        onSaved: (value) => _price = double.parse(value!),
+                        validator: (value) {
+                          if (value == null || double.tryParse(value) == null) {
+                            return 'Por favor ingrese un precio válido.';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: CustomNumberField(
+                        initialValue: _percentageTax.toString(),
+                        label: 'IVA (%)',
+                        onSaved: (value) =>
+                            _percentageTax = double.parse(value!),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Divider(thickness: 1),
+                const SizedBox(height: 10),
+                Text(
+                  'Inventario',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('En inventario: $_stock',
+                        style: const TextStyle(fontSize: 16)),
+                    Text(
+                      'Precio promedio: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                if (_stockDetails.isNotEmpty)
+                  ExpansionTile(
+                    title: Text(
+                      'Detalles del Inventario',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    children: _stockDetails.map((stockDetail) {
+                      final index = _stockDetails.indexOf(stockDetail);
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 3,
+                        child: ExpansionTile(
+                          title: Row(
+                            children: [
+                              // Contenedor con inicial del proveedor
+                              Container(
+                                width: 60,
+                                height: 60,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.blue.shade100,
+                                ),
+                                child: Text(
+                                  stockDetail.provider[0].toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              // Información resumida
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      stockDetail.provider,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Cantidad: ${stockDetail.quantity}',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                           children: [
-                            // Información de los detalles del stock organizada en una columna
-                            Expanded(
-                              flex: 3,
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  const Divider(),
                                   Text(
                                     'Proveedor: ${stockDetail.provider}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 14),
                                   ),
-                                  const SizedBox(height: 5),
+                                  const SizedBox(height: 4),
                                   Text(
-                                      'Precio de compra: \$${stockDetail.purchasePrice.toStringAsFixed(2)}'),
-                                  const SizedBox(height: 5),
-                                  Text('Unidades compradas: ${stockDetail.quantityPurchased}'),
-                                  const SizedBox(height: 5),
-                                  Text('En inventario: ${stockDetail.quantity}'),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                      'Ganancia bruta total: \$${stockDetail.totalGrossProfit.toStringAsFixed(2)}'),
-                                ],
-                              ),
-                            ),
-                            // Botones de acción (Editar, Eliminar)
-                            Expanded(
-                              flex: 1,
-                              child: Column(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      // Abrir ventana para modificar detalle
-                                      _showStockDetailDialog(
-                                        stockDetail: stockDetail,
-                                        index: index,
-                                      );
-                                    },
+                                    'Precio de Compra: \$${stockDetail.purchasePrice.toStringAsFixed(2)}',
+                                    style: const TextStyle(fontSize: 14),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      setState(() {
-                                        _stockDetails.removeAt(index);
-                                        updateStock();
-                                      });
-                                    },
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Cantidad en inventario: ${stockDetail.quantity}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Cantidad comprada: ${stockDetail.quantityPurchased}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit,
+                                            color: Colors.blue),
+                                        onPressed: () => _showStockDetailDialog(
+                                          stockDetail: stockDetail,
+                                          index: index,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.red),
+                                        onPressed: () =>
+                                            _confirmDeleteDetail(index),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    }).toList(),
+                  ),
+                const SizedBox(height: 20),
+                Center(
+                  child: CustomButton(
+                    onPressed: _saveForm,
+                    text: 'Guardar Producto',
+                    type: ButtonType.primary,
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
                 ),
-              ),
-
-              CustomButton(
-                onPressed: _saveForm,
-                text: 'Guardar',
-                type: ButtonType.primary,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.3,
+        children: [
+          SpeedDialChild(
+            label: 'Añadir inventario',
+            child: const Icon(Icons.add),
+            onTap: () => _showStockDetailDialog(),
+          ),
+        ],
       ),
     );
   }
