@@ -224,6 +224,35 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
+  // Helper para crear elementos de detalle
+  Widget _buildDetailItem(BuildContext context,
+      {required IconData icon, required String label, required String value}) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue.shade400),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -310,7 +339,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 if (_stockDetails.isNotEmpty)
                   ExpansionTile(
                     title: Text(
-                      'Detalles del Inventario',
+                      'Detalles de existencias',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -318,111 +347,102 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     children: _stockDetails.map((stockDetail) {
                       final index = _stockDetails.indexOf(stockDetail);
                       return Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 3,
-                        child: ExpansionTile(
-                          title: Row(
-                            children: [
-                              // Contenedor con inicial del proveedor
-                              Container(
-                                width: 60,
-                                height: 60,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.blue.shade100,
-                                ),
-                                child: Text(
-                                  stockDetail.provider[0].toUpperCase(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-
-                              // Información resumida
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      stockDetail.provider,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Cantidad: ${stockDetail.quantity}',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          children: [
-                            Padding(
+                          elevation: 0,
+                          child: InkWell(
+                            onTap: () => _showStockDetailDialog(
+                              stockDetail: stockDetail,
+                              index: index,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                            child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Divider(),
-                                  Text(
-                                    'Proveedor: ${stockDetail.provider}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Precio de Compra: \$${stockDetail.purchasePrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Cantidad en inventario: ${stockDetail.quantity}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Cantidad comprada: ${stockDetail.quantityPurchased}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 8),
+                                  // Encabezado con inicial y nombre del proveedor
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.blue),
-                                        onPressed: () => _showStockDetailDialog(
-                                          stockDetail: stockDetail,
-                                          index: index,
+                                      // Avatar con la inicial del proveedor
+                                      CircleAvatar(
+                                        radius: 24,
+                                        backgroundColor: Colors.blue.shade100,
+                                        child: Text(
+                                          stockDetail.provider[0].toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
+                                      const SizedBox(width: 16),
+
+                                      // Nombre del proveedor
+                                      Text(
+                                        stockDetail.provider,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+
+                                      // Botones de acción (edit y delete) alineados a la derecha
+                                      const Spacer(), // Asegura que los botones se alineen a la derecha
                                       IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.red),
+                                        icon: const Icon(Icons.delete_forever,
+                                            color: Colors.red, size: 28),
                                         onPressed: () =>
                                             _confirmDeleteDetail(index),
                                       ),
                                     ],
                                   ),
+                                  const SizedBox(height: 16),
+                                  // Detalles del inventario
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _buildDetailItem(
+                                        context,
+                                        icon: Icons.attach_money,
+                                        label: 'Precio Compra',
+                                        value:
+                                            '\$${stockDetail.purchasePrice.toStringAsFixed(2)}',
+                                      ),
+                                      _buildDetailItem(
+                                        context,
+                                        icon: Icons.inventory,
+                                        label: 'En Inventario',
+                                        value: '${stockDetail.quantity}',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _buildDetailItem(
+                                        context,
+                                        icon: Icons.shopping_cart,
+                                        label: 'Comprado',
+                                        value:
+                                            '${stockDetail.quantityPurchased}',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      );
+                          ));
                     }).toList(),
                   ),
                 const SizedBox(height: 20),
