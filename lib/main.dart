@@ -5,6 +5,7 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'providers/product_provider.dart'; // Importa tu ProductProvider
 import 'services/api_service.dart'; // Asegúrate de importar ApiService
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider(apiService)),
       ],
       child: MaterialApp(
+        localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+        supportedLocales: const [Locale('es'), Locale('en')],
         title: 'Flutter Demo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

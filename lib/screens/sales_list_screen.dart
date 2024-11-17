@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hola_mundo/models/sales_consultation.dart';
 import 'package:hola_mundo/models/sales_inquiries.dart';
 import 'package:hola_mundo/services/sale_service.dart';
-import '../services/api_service.dart';
+import 'package:hola_mundo/widgets/custom_button.dart';
 import '../models/sale.dart';
 import 'sale_detail_screen.dart';
 
@@ -13,7 +13,7 @@ class SalesListScreen extends StatefulWidget {
 
 class _SalesListScreenState extends State<SalesListScreen> {
   late SaleService _apiService;
-  late Future<List<Sale>> _sales;
+  late Future<List<Sale>>? _sales;
   SalesInquiries? _salesInquiries;
   String _totalInvoiced = "0";
   DateTimeRange? _selectedDateRange;
@@ -27,6 +27,9 @@ class _SalesListScreenState extends State<SalesListScreen> {
 
   void _loadSalesForCurrentMonth() async {
     try {
+      setState(() {
+        _sales = null; // Indicar que se está cargando
+      });
       _selectedDateRange = DateTimeRange(
           start: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
           end: DateTime.now().copyWith(hour: 23, minute: 59, second: 59));
@@ -34,13 +37,24 @@ class _SalesListScreenState extends State<SalesListScreen> {
         startDate: _selectedDateRange!.start,
         endDate: _selectedDateRange!.end,
       );
+      // Llamar a la API
+      final inquiries =
+          await _apiService.consultationSales(salesConsultation.toJson());
+
+      // Actualizar el estado con los nuevos datos
       setState(() {
-        _sales = _apiService
-            .consultationSales(salesConsultation.toJson())
-            .then((salesInquiries) => salesInquiries.sales ?? []);
+        _salesInquiries = inquiries; // Guardar los datos completos
+        _totalInvoiced =
+            inquiries.metrics?.totalInvoiced?.toStringAsFixed(2) ?? "0";
+        _sales = Future.value(inquiries.sales ?? []);
       });
     } catch (e) {
       print('Error al cargar las ventas del mes actual: $e');
+      // Manejar errores
+      setState(() {
+        _totalInvoiced = "0"; // Restablecer en caso de error
+        _sales = Future.value([]); // Vaciar la lista de ventas
+      });
     }
   }
 
@@ -76,6 +90,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
   Future<void> _selectDateRange() async {
     final today = DateTime.now();
     final newDateRange = await showDateRangePicker(
+      locale: const Locale('es'),
       context: context,
       initialDateRange: _selectedDateRange,
       firstDate: DateTime(today.year - 5),
@@ -93,10 +108,10 @@ class _SalesListScreenState extends State<SalesListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Histórico de Ventas'),
+        title: const Text('Histórico de Ventas'),
         actions: [
           IconButton(
-            icon: Icon(Icons.date_range),
+            icon: const Icon(Icons.date_range),
             onPressed: _selectDateRange,
           ),
         ],
@@ -116,41 +131,44 @@ class _SalesListScreenState extends State<SalesListScreen> {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8.0),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
-                    onPressed: _selectDateRange,
-                    icon: Icon(Icons.calendar_today),
-                    label: Text('Cambiar fechas'),
-                  ),
+                CustomButton(
+                  text: 'Cambiar fechas',
+                  type: ButtonType.flat,
+                  onPressed: _selectDateRange,
+                  icon: const Icon(Icons.calendar_today),
+                  minimumSize: const Size(double.infinity, 48),
                 ),
                 const SizedBox(height: 8.0),
-                Text("Total facturado: " + _totalInvoiced),
+                Text("Total facturado: $_totalInvoiced"),
               ],
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<Sale>>(
-              future: _sales,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return _buildSkeletonLoader(); // Skeleton Loader
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error al cargar las ventas'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No hay ventas en este rango.'));
-                } else {
-                  final sales = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: sales.length,
-                    itemBuilder: (context, index) {
-                      final sale = sales[index];
-                      return _buildSaleCard(sale);
+            child: _sales == null
+                ? _buildSkeletonLoader() // Mostrar skeleton si está cargando
+                : FutureBuilder<List<Sale>>(
+                    future: _sales,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildSkeletonLoader(); // Skeleton Loader
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                            child: Text('Error al cargar las ventas'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('No hay ventas en este rango.'));
+                      } else {
+                        final sales = snapshot.data!;
+                        return ListView.builder(
+                          itemCount: sales.length,
+                          itemBuilder: (context, index) {
+                            final sale = sales[index];
+                            return _buildSaleCard(sale);
+                          },
+                        );
+                      }
                     },
-                  );
-                }
-              },
-            ),
+                  ),
           ),
         ],
       ),
