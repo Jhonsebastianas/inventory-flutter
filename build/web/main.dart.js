@@ -93868,7 +93868,7 @@ k=A.cE(p,A.eE(B.lv,B.bz,p,p,40),B.o,p,p,new A.cM(B.kT,p,p,k,p,p,p,B.ar),p,60,p,p
 s=A.M(a).p2.w
 s=s==null?p:s.oj(B.aJ)
 r=t.p
-return A.aKk(n,B.am,A.yx(A.ny(!1,l,!0,new A.bb(B.bV,A.cC(A.a([k,B.jO,A.dv(A.bL(A.a([A.aj(o.c,p,p,p,s,p,p),B.eQ,A.aj(o.d,p,p,p,A.e2(p,p,B.e6,p,p,p,p,p,p,p,p,14,p,p,p,p,p,!0,p,p,p,p,p,p,p,p),p,p),B.eQ,q.DG(a,B.pF,"Existencias:",""+o.f),B.eQ,q.DG(a,B.lt,"Total:","$"+B.c.ar(o.e,2)),B.eQ,q.DG(a,B.OR,"Impuestos (IVA):",A.j(o.r)+"%")],r),B.al,B.r,B.y),1),A.fV(p,A.eE(B.i7,B.oP,p,p,p),p,new A.alk(q,a),p,p,p)],r),B.al,B.r,B.y),p),p,!0,p,p,p,p,p,p,p,p,p,q.d,p,p,p,p),p,0,B.ed,new A.cB(m,B.n)),new A.all(q,a),B.la,new A.dO(o.a,t.kK),new A.alm(q),B.bU)},
+return A.aKk(n,B.am,A.yx(A.ny(!1,l,!0,new A.bb(B.bV,A.cC(A.a([k,B.jO,A.dv(A.bL(A.a([A.aj(o.c,p,p,p,s,p,p),B.eQ,A.aj(o.d,p,p,p,A.e2(p,p,B.e6,p,p,p,p,p,p,p,p,14,p,p,p,p,p,!0,p,p,p,p,p,p,p,p),p,p),B.eQ,q.DG(a,B.pF,"Existencias:",""+o.f),B.eQ,q.DG(a,B.lt,"Venta:","$"+B.c.ar(o.e,2)),B.eQ,q.DG(a,B.OR,"Impuestos (IVA):",A.j(o.r)+"%")],r),B.al,B.r,B.y),1),A.fV(p,A.eE(B.i7,B.oP,p,p,p),p,new A.alk(q,a),p,p,p)],r),B.al,B.r,B.y),p),p,!0,p,p,p,p,p,p,p,p,p,q.d,p,p,p,p),p,0,B.ed,new A.cB(m,B.n)),new A.all(q,a),B.la,new A.dO(o.a,t.kK),new A.alm(q),B.bU)},
 DG(a,b,c,d){var s=null,r=A.eE(b,B.hB,s,s,20),q=A.aj(c,s,s,s,A.e2(s,s,B.bz,s,s,s,s,s,s,s,s,12,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s),p=A.M(a).p2.z
 return A.cC(A.a([r,B.c2,q,B.c2,A.aj(d,s,s,s,p==null?s:p.oj(B.aJ),s,s)],t.p),B.w,B.r,B.y)}}
 A.alg.prototype={

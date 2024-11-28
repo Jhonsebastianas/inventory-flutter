@@ -275,7 +275,7 @@ class ProductTile extends StatelessWidget {
                       _buildDetailSale(
                         context,
                         icon: Icons.attach_money,
-                        label: 'Total:',
+                        label: 'Venta:',
                         value: '\$${product.price.toStringAsFixed(2)}',
                       ),
                       const SizedBox(height: 4),
