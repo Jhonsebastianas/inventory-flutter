@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
 import 'package:hola_mundo/core/constants/constants.dart';
+import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/providers/product_provider.dart';
 import 'package:hola_mundo/modules/products/screens/product_form_screen.dart';
 import 'package:hola_mundo/modules/sales/screens/sales_list_screen.dart';
@@ -42,6 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
     );
+  }
+
+  _onTap(String routeName) {
+    Navigator.pushNamed(context, routeName);
   }
 
   @override
@@ -88,11 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.inventory_2,
                     color: Colors.blueAccent,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ProductScreen(), // Pantalla con las opciones de CRUD para productos
-                        ),
-                      );
+                      AppRoutes.onTabChangeRoute(
+                          context, AppRoutes.products);
                     },
                   ),
                   // Card para acceder a ventas
@@ -102,11 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.point_of_sale,
                     color: Colors.deepPurpleAccent,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => SalesScreen(), // Nueva pantalla de ventas
-                        ),
-                      );
+                      AppRoutes.onTabChangeRoute(
+                          context, AppRoutes.sales);
                     },
                   ),
                   _buildCard(
@@ -115,11 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.history,
                     color: Colors.grey,
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => SalesListScreen(), // Nueva pantalla de ventas
-                        ),
-                      );
+                      AppRoutes.onTabChangeRoute(
+                          context, AppRoutes.salesHistory);
                     },
                   ),
                 ],
@@ -128,7 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavBar(currentIndex: Constants.menuIndexHome,),
+      bottomNavigationBar: const CustomBottomNavBar(
+        currentIndex: Constants.menuIndexHome,
+      ),
     );
   }
 
@@ -190,7 +188,7 @@ class ProductScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: GridView(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,  // Dos tarjetas por fila
+            crossAxisCount: 2, // Dos tarjetas por fila
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
@@ -225,7 +223,9 @@ class ProductScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavBar(currentIndex: Constants.menuIndexProducts,),
+      bottomNavigationBar: const CustomBottomNavBar(
+        currentIndex: Constants.menuIndexProducts,
+      ),
     );
   }
 
