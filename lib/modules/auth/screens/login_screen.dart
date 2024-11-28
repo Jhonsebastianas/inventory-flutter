@@ -4,11 +4,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
-import 'package:hola_mundo/screens/forgot_password_screen.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
+import 'package:hola_mundo/modules/auth/screens/forgot_password_screen.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'home_screen.dart';
+import '../../home/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {

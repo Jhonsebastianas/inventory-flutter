@@ -1,7 +1,7 @@
 // lib/screens/sale_detail_screen.dart
 
 import 'package:flutter/material.dart';
-import '../models/sale.dart';
+import '../../../shared/models/sale.dart';
 
 class SaleDetailScreen extends StatelessWidget {
   final Sale sale;

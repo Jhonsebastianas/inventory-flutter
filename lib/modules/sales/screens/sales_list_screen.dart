@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hola_mundo/models/sales_consultation.dart';
-import 'package:hola_mundo/models/sales_inquiries.dart';
-import 'package:hola_mundo/services/sale_service.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import '../models/sale.dart';
+import 'package:hola_mundo/shared/models/sales_consultation.dart';
+import 'package:hola_mundo/shared/models/sales_inquiries.dart';
+import 'package:hola_mundo/shared/services/sale_service.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import '../../../shared/models/sale.dart';
 import 'sale_detail_screen.dart';
 
 class SalesListScreen extends StatefulWidget {

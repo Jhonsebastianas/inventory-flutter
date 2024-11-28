@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
-import 'package:hola_mundo/screens/login_screen.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
+import 'package:hola_mundo/modules/auth/screens/login_screen.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

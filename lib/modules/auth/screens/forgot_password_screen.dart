@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/config/api_config.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'otp_screen.dart';
 import 'package:http/http.dart' as http;

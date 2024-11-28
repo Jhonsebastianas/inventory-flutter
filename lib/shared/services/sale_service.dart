@@ -1,9 +1,9 @@
-import 'package:hola_mundo/models/sale.dart';
-import 'package:hola_mundo/models/sales_inquiries.dart';
+import 'package:hola_mundo/shared/models/sale.dart';
+import 'package:hola_mundo/shared/models/sales_inquiries.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/api_config.dart'; // Importar la configuración
+import '../../config/api_config.dart'; // Importar la configuración
 
 class SaleService {
   final String baseUrl = ApiConfig.baseUrl;

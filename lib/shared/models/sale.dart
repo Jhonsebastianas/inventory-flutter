@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:hola_mundo/models/file_dto.dart';
+import 'package:hola_mundo/shared/models/file_dto.dart';
 
 class Sale {
   final String id;

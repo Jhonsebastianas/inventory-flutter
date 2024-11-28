@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/api_config.dart'; // Importar la configuración
+import '../../config/api_config.dart'; // Importar la configuración
 
 class ApiService {
   final String baseUrl = ApiConfig.baseUrl;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_text_field.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_number_field.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.dart';
 import 'package:provider/provider.dart';
-import '../providers/product_provider.dart';
-import '../models/product.dart';
+import '../../../shared/providers/product_provider.dart';
+import '../../../shared/models/product.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? product;

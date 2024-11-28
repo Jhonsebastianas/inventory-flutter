@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hola_mundo/models/product.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/models/product.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import '../providers/product_provider.dart';
+import '../../../shared/providers/product_provider.dart';
 import 'product_form_screen.dart';
 
 class ProductListScreen extends StatelessWidget {

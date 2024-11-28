@@ -1,15 +1,15 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:hola_mundo/models/file_dto.dart';
-import 'package:hola_mundo/services/sale_service.dart';
-import 'package:hola_mundo/widgets/custom_button.dart';
-import 'package:hola_mundo/widgets/forms/text_fields/custom_number_field.dart';
+import 'package:hola_mundo/shared/models/file_dto.dart';
+import 'package:hola_mundo/shared/services/sale_service.dart';
+import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
-import 'package:hola_mundo/models/product.dart';
+import 'package:hola_mundo/shared/models/product.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
-import 'package:hola_mundo/models/sale.dart';
-import 'package:hola_mundo/providers/product_provider.dart';
+import 'package:hola_mundo/shared/models/sale.dart';
+import 'package:hola_mundo/shared/providers/product_provider.dart';
 
 class SalesScreen extends StatefulWidget {
   @override

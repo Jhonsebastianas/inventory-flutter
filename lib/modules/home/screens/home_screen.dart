@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hola_mundo/providers/product_provider.dart';
-import 'package:hola_mundo/screens/product_form_screen.dart';
-import 'package:hola_mundo/screens/sales_list_screen.dart';
+import 'package:hola_mundo/config/api_config.dart';
+import 'package:hola_mundo/core/constants/constants.dart';
+import 'package:hola_mundo/shared/providers/product_provider.dart';
+import 'package:hola_mundo/modules/products/screens/product_form_screen.dart';
+import 'package:hola_mundo/modules/sales/screens/sales_list_screen.dart';
+import 'package:hola_mundo/shared/widgets/layout/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login_screen.dart';
-import 'product_list_screen.dart';
-import 'sales_screen.dart'; // Nueva pantalla de ventas
+import '../../auth/screens/login_screen.dart';
+import '../../products/screens/product_list_screen.dart';
+import '../../sales/screens/sales_screen.dart'; // Nueva pantalla de ventas
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,6 +18,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? _userName;
+
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -123,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: Constants.menuIndexHome,),
     );
   }
 
@@ -219,6 +225,7 @@ class ProductScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: Constants.menuIndexProducts,),
     );
   }
 
