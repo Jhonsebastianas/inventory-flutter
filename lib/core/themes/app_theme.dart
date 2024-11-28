@@ -16,6 +16,11 @@ class AppTheme {
       buttonColor: Colors.blue,
       textTheme: ButtonTextTheme.primary,
     ),
+    colorScheme: const ColorScheme.light(
+      primary: Colors.blue,
+      secondary: Colors.green,
+      error: Colors.red,
+    ),
   );
 
   static ThemeData darkTheme = ThemeData(

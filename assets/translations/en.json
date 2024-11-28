@@ -1,0 +1,18 @@
+{
+  "welcome": "Welcome",
+  "button_text": "Click me",
+  "auth": {
+    "login": {
+      "clave": "Password",
+      "ingresar": "Login",
+      "ingresar_clave": "Enter your password",
+      "ingresar_usuario": "Enter your username",
+      "iniciar_sesion": "Log in",
+      "no_tiene_cuenta": "Don't have an account?",
+      "olvido_clave": "Forgot your password?",
+      "registrate": "Register",
+      "usuario": "Username",
+      "usuario_o_clave_no_validos": "Invalid username or password"
+    }
+  }
+}

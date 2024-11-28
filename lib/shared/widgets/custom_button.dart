@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/core/themes/text_styles.dart';
 
 enum ButtonType { primary, secondary, danger, outline, flat, flatDanger }
 
@@ -80,10 +81,8 @@ class CustomButton extends StatelessWidget {
           ],
           Text(
             text,
-            style: TextStyle(
+            style: TextStyles.buttonText.copyWith(
               color: isEnabled ? textColor : Colors.grey.shade600,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
             ),
           ),
         ],

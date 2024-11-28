@@ -11,7 +11,8 @@ class ProductListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +50,8 @@ class ProductListScreen extends StatelessWidget {
               itemCount: 5, // Número de elementos de esqueleto para mostrar
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey.shade300,
                     highlightColor: Colors.grey.shade100,
@@ -92,7 +94,8 @@ class ProductListScreen extends StatelessWidget {
             return Consumer<ProductProvider>(
               builder: (context, productProvider, child) {
                 if (productProvider.products.isEmpty) {
-                  return const Center(child: Text('No hay productos registrados.'));
+                  return const Center(
+                      child: Text('No hay productos registrados.'));
                 } else {
                   return ListView.builder(
                     itemCount: productProvider.products.length,
@@ -103,7 +106,8 @@ class ProductListScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => ProductFormScreen(product: product),
+                              builder: (context) =>
+                                  ProductFormScreen(product: product),
                             ),
                           );
                         },
@@ -140,7 +144,8 @@ class ProductTile extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Confirmación'),
-        content: const Text('¿Estás seguro de que deseas eliminar este producto?'),
+        content:
+            const Text('¿Estás seguro de que deseas eliminar este producto?'),
         actions: [
           CustomButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -182,7 +187,8 @@ class ProductTile extends StatelessWidget {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('Confirmación'),
-            content: const Text('¿Estás seguro de que deseas eliminar este producto?'),
+            content: const Text(
+                '¿Estás seguro de que deseas eliminar este producto?'),
             actions: [
               CustomButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
@@ -209,17 +215,18 @@ class ProductTile extends StatelessWidget {
         }
       },
       child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
         ),
         elevation: 0,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Imagen de Producto o un Placeholder
                 Container(
@@ -236,7 +243,7 @@ class ProductTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Información del Producto
                 Expanded(
                   child: Column(
@@ -244,7 +251,10 @@ class ProductTile extends StatelessWidget {
                     children: [
                       Text(
                         product.name,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -255,21 +265,25 @@ class ProductTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '\$${product.price.toStringAsFixed(2)} • IVA: ${product.percentageTax}%',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
+                      _buildDetailSale(
+                        context,
+                        icon: Icons.inventory,
+                        label: 'Existencias:',
+                        value: "${product.stock}",
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Existencias: ${product.stock}',
-                        style: TextStyle(
-                          color: product.stock > 0 ? Colors.green : Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      _buildDetailSale(
+                        context,
+                        icon: Icons.attach_money,
+                        label: 'Total:',
+                        value: '\$${product.price.toStringAsFixed(2)}',
+                      ),
+                      const SizedBox(height: 4),
+                      _buildDetailSale(
+                        context,
+                        icon: Icons.calculate_outlined,
+                        label: 'Impuestos (IVA):',
+                        value: '${product.percentageTax}%',
                       ),
                     ],
                   ),
@@ -288,6 +302,30 @@ class ProductTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDetailSale(BuildContext context,
+      {required IconData icon, required String label, required String value}) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue.shade400),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.grey.shade600,
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ],
     );
   }
 }

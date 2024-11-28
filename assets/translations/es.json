@@ -1,0 +1,18 @@
+{
+  "welcome": "Bienvenido",
+  "button_text": "Haz clic",
+  "auth": {
+    "login": {
+      "clave": "Contraseña",
+      "ingresar": "Ingresar",
+      "ingresar_clave": "Ingrese su contraseña",
+      "ingresar_usuario": "Ingrese su nombre de usuario",
+      "iniciar_sesion": "Iniciar sesión",
+      "no_tiene_cuenta": "¿No tienes una cuenta?",
+      "olvido_clave": "¿Ha olvidado su contraseña?",
+      "registrate": "Registrate",
+      "usuario": "Usuario",
+      "usuario_o_clave_no_validos": "Nombre de usuario o contraseña no válidos"
+    }
+  }
+}
