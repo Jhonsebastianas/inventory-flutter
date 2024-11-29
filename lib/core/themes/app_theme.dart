@@ -17,7 +17,7 @@ class AppTheme {
       textTheme: ButtonTextTheme.primary,
     ),
     colorScheme: const ColorScheme.light(
-      primary: Colors.blue,
+      primary: Color.fromARGB(255, 159, 171, 181),
       secondary: Colors.green,
       error: Colors.red,
     ),

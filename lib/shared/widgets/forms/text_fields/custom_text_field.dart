@@ -4,8 +4,11 @@ class CustomTextField extends StatefulWidget {
   final String? initialValue;
   final String label;
   final String? hintText;
+  final bool? enabled;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final void Function()? onEditingComplete;
+  final ValueChanged<String>? onChanged;
   final void Function(String?)? onSaved;
   final TextInputType keyboardType;
   final bool? obscureText;
@@ -14,6 +17,9 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     Key? key,
     required this.label,
+    this.enabled,
+    this.onEditingComplete,
+    this.onChanged,
     this.onSaved,
     this.controller,
     this.hintText,
@@ -40,12 +46,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: widget.enabled,
       controller: widget.controller,
       focusNode: widget.focusNode,
       initialValue: widget.initialValue,
       keyboardType: widget.keyboardType,
       obscureText: widget.obscureText == true && !isPasswordVisible,
       onSaved: widget.onSaved,
+      onChanged: widget.onChanged,
+      onEditingComplete: widget.onEditingComplete,
       validator: widget.validator,
       decoration: InputDecoration(
         border: OutlineInputBorder(

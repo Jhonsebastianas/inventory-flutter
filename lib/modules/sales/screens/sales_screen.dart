@@ -1,5 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/modules/clients/models/register_client.dart';
+import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
@@ -17,6 +19,7 @@ class SalesScreen extends StatefulWidget {
 }
 
 class _SalesScreenState extends State<SalesScreen> {
+  RegisterClient? _clientData; // Almacena los datos del cliente seleccionados
   final String EFECTIVO = "Efectivo";
   List<SaleProduct> _selectedProducts =
       []; // Productos seleccionados para la venta
@@ -48,6 +51,13 @@ class _SalesScreenState extends State<SalesScreen> {
     setState(() {
       _totalAmount = total;
       _returned = totalPayments - total;
+    });
+  }
+
+  // Función callback que se pasará a AddClientForm
+  void _handleClientUpdate(RegisterClient client) {
+    setState(() {
+      _clientData = client;
     });
   }
 
@@ -311,6 +321,7 @@ class _SalesScreenState extends State<SalesScreen> {
       'proofPayment': _receiptFile != null
           ? (await createFileDTO(File(_receiptFile!.path))).toMap()
           : null,
+      'client': _clientData != null ? _clientData?.toJson() : null,
     };
 
     // Consumir el servicio de creación de venta
@@ -404,6 +415,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 // Sección de Productos
                 ExpansionTile(
                   title: NumOfItems(
+                    icon: const Icon(Icons.sell_outlined),
                     numOfItem: _selectedProducts.length,
                     title: 'Productos',
                   ),
@@ -456,6 +468,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 // Sección de Métodos de Pago
                 ExpansionTile(
                   title: NumOfItems(
+                    icon: Icon(Icons.payment_outlined),
                     numOfItem: _paymentMethods.length,
                     title: 'Métodos de Pago',
                   ),
@@ -498,26 +511,41 @@ class _SalesScreenState extends State<SalesScreen> {
                   ],
                 ),
 
-                // Sección de Comprobante
+                // Sección del cliente
                 ExpansionTile(
                   title: NumOfItems(
+                    icon: const Icon(Icons.person_2_outlined),
                     numOfItem: _receiptFile != null ? 1 : 0,
-                    title: 'Comprobante',
+                    title: 'Cliente (opcional)',
                   ),
                   children: [
-                    CustomButton(
-                      text: _receiptFile != null
-                          ? 'Comprobante capturado'
-                          : 'Tomar foto del comprobante',
-                      type: ButtonType.flat,
-                      onPressed: _takePhoto,
-                      icon: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.blue,
-                      ),
-                    ),
+                    const SizedBox(height: 10),
+                    AddClientForm(onClientUpdated: _handleClientUpdate,),
+                    const SizedBox(height: 10),
                   ],
                 ),
+
+                // Sección de Comprobante
+                // ExpansionTile(
+                //   title: NumOfItems(
+                //     icon: const Icon(Icons.file_upload_outlined),
+                //     numOfItem: _receiptFile != null ? 1 : 0,
+                //     title: 'Comprobante',
+                //   ),
+                //   children: [
+                //     CustomButton(
+                //       text: _receiptFile != null
+                //           ? 'Comprobante capturado'
+                //           : 'Tomar foto del comprobante',
+                //       type: ButtonType.flat,
+                //       onPressed: _takePhoto,
+                //       icon: const Icon(
+                //         Icons.camera_alt,
+                //         color: Colors.blue,
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 15.0),
@@ -564,10 +592,12 @@ class NumOfItems extends StatelessWidget {
     super.key,
     required this.numOfItem,
     required this.title,
+    required this.icon,
   });
 
   final int numOfItem;
   final String title;
+  final Icon icon;
 
   @override
   Widget build(BuildContext context) {
@@ -594,6 +624,8 @@ class NumOfItems extends StatelessWidget {
                     .copyWith(color: Colors.blueAccent),
               ),
             ),
+            const SizedBox(width: 8),
+            icon,
             const SizedBox(width: 8),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
           ],
