@@ -20,7 +20,7 @@ class StockDetail {
   factory StockDetail.fromJson(Map<String, dynamic> json) {
     return StockDetail(
       id: json['id'],
-      provider: json['provider'],
+      provider: json['provider'] ?? '',
       purchasePrice: json['purchasePrice'].toDouble(),
       quantity: json['quantity'],
       quantityPurchased: json['quantityPurchased'] is Map<String, dynamic> 
@@ -56,6 +56,7 @@ class Product {
   double price;
   int stock;
   double percentageTax;
+  String? presentation;
   List<StockDetail> stockDetails;
   double weightedAveragePurchasePrice;
 
@@ -67,6 +68,7 @@ class Product {
     required this.price,
     required this.stock,
     required this.percentageTax,
+    this.presentation,
     required this.stockDetails,
     required this.weightedAveragePurchasePrice,
   });
@@ -85,6 +87,7 @@ class Product {
       percentageTax: json['percentageTax'] is Map<String, dynamic> 
           ? (json['percentageTax'] != null) ? double.parse(json['percentageTax']) : 0.0 // Para Decimal128
           : (json['percentageTax'] != null) ? json['percentageTax'].toDouble() : 0.0, // Para Number normal
+      presentation: json['presentation'] ?? 'unidad',
       stockDetails: (json['stockDetails'] as List)
           .map((detail) => StockDetail.fromJson(detail))
           .toList(),
@@ -104,6 +107,7 @@ class Product {
       'price': price,
       'stock': stock,
       'percentageTax': percentageTax,
+      'presentation': presentation,
       'stockDetails': stockDetails.map((detail) => detail.toJson()).toList(),
       'weightedAveragePurchasePrice': weightedAveragePurchasePrice,
     };

@@ -6,9 +6,15 @@ import 'package:shimmer/shimmer.dart';
 import '../../../shared/providers/product_provider.dart';
 import 'product_form_screen.dart';
 
-class ProductListScreen extends StatelessWidget {
+class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
 
+  @override
+  _ProductListScreenState createState() => _ProductListScreenState();
+}
+
+class _ProductListScreenState extends State<ProductListScreen> {
+  
   @override
   Widget build(BuildContext context) {
     final productProvider =
