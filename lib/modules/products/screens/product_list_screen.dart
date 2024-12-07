@@ -14,7 +14,16 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  
+
+  bool _isSearching = false; // Para controlar la búsqueda
+  Product? _selectedProduct;
+
+  void _selectProduct(Product product) {
+    setState(() {
+      _selectedProduct = product;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final productProvider =
