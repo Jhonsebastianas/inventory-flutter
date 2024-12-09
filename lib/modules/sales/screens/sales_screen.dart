@@ -2,6 +2,7 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:hola_mundo/modules/clients/models/register_client.dart';
 import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
+import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
@@ -36,6 +37,21 @@ class _SalesScreenState extends State<SalesScreen> {
       _isSearching = query.isNotEmpty;
     });
     Provider.of<ProductProvider>(context, listen: false).searchProducts(query);
+  }
+
+  // Función para reiniciar el estado de la pantalla
+  void resetScreenState() {
+    setState(() {
+      _selectedProducts.clear();
+      _selectedProducts = [];
+      _totalAmount = 0.0;
+      _paymentMethods = [];
+      _isSearching = false;
+      _clientData = null;
+      _returned = 0;
+      _receiptFile = null;
+      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+    });
   }
 
   // Método para actualizar el total
@@ -329,23 +345,25 @@ class _SalesScreenState extends State<SalesScreen> {
     try {
       final response = await saleService.createSale(sale);
 
-      if (response.statusCode == 201) {
+      if (response['statusCode'] == 201) {
+        final saleId = response['data']; // Obtiene el ID de la venta
         // Venta creada exitosamente
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('¡Venta realizada con éxito!')),
         );
-        setState(() {
-          _selectedProducts.clear();
-          _paymentMethods = [new PaymentMethod(type: EFECTIVO, amount: 0)];
-          _totalAmount = 0.0;
-          _receiptFile = null;
-          Provider.of<ProductProvider>(context, listen: false).fetchProducts();
-        });
+
+        resetScreenState();
+        // Aquí puedes usar `saleId` para redirigir al detalle, guardar en local, etc.
+        Navigator.pushNamed(
+          context,
+          AppRoutes.saleDetail,
+          arguments: {'idSale': saleId, 'isRecent': true},
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'No se ha podido completar la venta. Error: ${response.body}')),
+                  'No se ha podido completar la venta. Error: ${response['message']}')),
         );
       }
     } catch (error) {
@@ -520,7 +538,9 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                   children: [
                     const SizedBox(height: 10),
-                    AddClientForm(onClientUpdated: _handleClientUpdate,),
+                    AddClientForm(
+                      onClientUpdated: _handleClientUpdate,
+                    ),
                     const SizedBox(height: 10),
                   ],
                 ),

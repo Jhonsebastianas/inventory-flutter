@@ -1,3 +1,4 @@
+import 'package:hola_mundo/modules/sales/models/sale_detail_dto.dart';
 import 'package:hola_mundo/shared/models/sale.dart';
 import 'package:hola_mundo/shared/models/sales_inquiries.dart';
 import 'package:http/http.dart' as http;
@@ -15,12 +16,9 @@ class SaleService {
   }
 
   // POST: Crear una nueva venta
-  Future<http.Response> createSale(Map<String, dynamic> sale) async {
-    print(sale);
-
+  Future<Map<String, dynamic>> createSale(Map<String, dynamic> sale) async {
     final token = await _getToken();
-    print(token);
-    return await http.post(
+    final response = await http.post(
       Uri.parse('$baseUrl/sales'),
       headers: {
         'Cookie': 'fz_token=$token',
@@ -29,6 +27,12 @@ class SaleService {
       },
       body: jsonEncode(sale),
     );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al registrar la venta: ${response.body}');
+    }
   }
 
   // Obtener ventas por mes
@@ -72,6 +76,25 @@ class SaleService {
       return SalesInquiries.fromJson(data);
     } else {
       throw Exception('Error al obtener las ventas');
+    }
+  }
+
+  Future<SaleDetailDTO> fetchSaleDetail(String idSale) async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/sales/saleDetail?idSale=$idSale'),
+      headers: {
+        'Cookie': 'fz_token=$token',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final salesDetail = SaleDetailDTO.fromJson(jsonDecode(response.body));
+      return salesDetail;
+    } else {
+      throw Exception('Error al obtener el detalle de la venta');
     }
   }
 }

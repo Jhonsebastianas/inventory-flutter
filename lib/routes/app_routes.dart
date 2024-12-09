@@ -3,6 +3,7 @@ import 'package:hola_mundo/modules/account/screens/account_settings_screen.dart'
 import 'package:hola_mundo/modules/auth/screens/login_screen.dart';
 import 'package:hola_mundo/modules/products/screens/product_form_screen.dart';
 import 'package:hola_mundo/modules/products/screens/product_list_screen.dart';
+import 'package:hola_mundo/modules/sales/screens/sale_detail_screen.dart';
 import 'package:hola_mundo/modules/sales/screens/sales_list_screen.dart';
 import 'package:hola_mundo/modules/sales/screens/sales_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,6 +67,14 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => SalesScreen());
       case salesHistory:
         return MaterialPageRoute(builder: (_) => SalesListScreen());
+      case saleDetail:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => SaleDetailScreen(
+            idSale: args['idSale'],
+            isRecent: args['isRecent'],
+          ),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

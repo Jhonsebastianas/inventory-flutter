@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/sales_consultation.dart';
 import 'package:hola_mundo/shared/models/sales_inquiries.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
@@ -180,11 +181,13 @@ class _SalesListScreenState extends State<SalesListScreen> {
     return GestureDetector(
       onTap: () {
         // Navegar a la pantalla de detalles de la venta
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => SaleDetailScreen(sale: sale),
-          ),
+          AppRoutes.saleDetail,
+          arguments: {
+            'idSale': sale.id,
+            'isRecent': false,
+          },
         );
       },
       child: Card(
