@@ -30,6 +30,7 @@ class _SalesScreenState extends State<SalesScreen> {
   XFile? _receiptFile; // Cambia a XFile para trabajar con image_picker
   final ImagePicker _picker = ImagePicker(); // Instancia de ImagePicker
   bool _isSearching = false;
+  bool _isLoading = false; // Estado de carga
 
   // Método para buscar productos
   void _searchProduct(String query) {
@@ -310,8 +311,16 @@ class _SalesScreenState extends State<SalesScreen> {
     }
   }
 
+  void _paymentIsProcessed(bool state) {
+    setState(() {
+      _isLoading = state; // Bloquea el botón
+    });
+  }
+
   // Método para completar la venta
   void _completeSale() async {
+    _paymentIsProcessed(true);
+
     double totalPaid =
         _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
 
@@ -319,6 +328,7 @@ class _SalesScreenState extends State<SalesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('No hay productos seleccionados.')),
       );
+      _paymentIsProcessed(false);
       return;
     }
 
@@ -326,6 +336,7 @@ class _SalesScreenState extends State<SalesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('El pago no cubre el valor total de la venta.')),
       );
+      _paymentIsProcessed(false);
       return;
     }
 
@@ -370,8 +381,9 @@ class _SalesScreenState extends State<SalesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $error')),
       );
+    } finally {
+      _paymentIsProcessed(false);
     }
-
     // Aquí podrías guardar la venta en MongoDB o en tu base de datos local.
   }
 
@@ -544,28 +556,6 @@ class _SalesScreenState extends State<SalesScreen> {
                     const SizedBox(height: 10),
                   ],
                 ),
-
-                // Sección de Comprobante
-                // ExpansionTile(
-                //   title: NumOfItems(
-                //     icon: const Icon(Icons.file_upload_outlined),
-                //     numOfItem: _receiptFile != null ? 1 : 0,
-                //     title: 'Comprobante',
-                //   ),
-                //   children: [
-                //     CustomButton(
-                //       text: _receiptFile != null
-                //           ? 'Comprobante capturado'
-                //           : 'Tomar foto del comprobante',
-                //       type: ButtonType.flat,
-                //       onPressed: _takePhoto,
-                //       icon: const Icon(
-                //         Icons.camera_alt,
-                //         color: Colors.blue,
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 15.0),
@@ -597,8 +587,12 @@ class _SalesScreenState extends State<SalesScreen> {
         height: 50,
         margin: const EdgeInsets.all(10),
         child: CustomButton(
-          onPressed: _completeSale,
-          text: 'Confirmar Venta (' + _totalAmount.toString() + ' COP)',
+          onPressed: _isLoading
+              ? () {}
+              : _completeSale, // Deshabilita el botón si está cargando
+          text: _isLoading
+              ? 'Procesando...' // Muestra un mensaje de carga
+              : 'Confirmar Venta ($_totalAmount COP)',
           type: ButtonType.primary,
           minimumSize: const Size(double.infinity, 48),
         ),
