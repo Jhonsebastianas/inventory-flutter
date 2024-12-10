@@ -6,6 +6,7 @@ import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/custom_snake_bar.dart';
 import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
 import 'package:hola_mundo/shared/models/product.dart';
@@ -325,17 +326,13 @@ class _SalesScreenState extends State<SalesScreen> {
         _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
 
     if (_selectedProducts.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No hay productos seleccionados.')),
-      );
+      CustomSnackBar.show(context: context, message: 'No hay productos seleccionados.');
       _paymentIsProcessed(false);
       return;
     }
 
     if (totalPaid < _totalAmount) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El pago no cubre el valor total de la venta.')),
-      );
+      CustomSnackBar.show(context: context, message: 'El pago no cubre el valor total de la venta.');
       _paymentIsProcessed(false);
       return;
     }
@@ -359,9 +356,7 @@ class _SalesScreenState extends State<SalesScreen> {
       if (response['statusCode'] == 201) {
         final saleId = response['data']; // Obtiene el ID de la venta
         // Venta creada exitosamente
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('¡Venta realizada con éxito!')),
-        );
+        CustomSnackBar.showSuccess(context, '¡Venta realizada con éxito!');
 
         resetScreenState();
         // Aquí puedes usar `saleId` para redirigir al detalle, guardar en local, etc.
@@ -371,16 +366,10 @@ class _SalesScreenState extends State<SalesScreen> {
           arguments: {'idSale': saleId, 'isRecent': true},
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'No se ha podido completar la venta. Error: ${response['message']}')),
-        );
+        CustomSnackBar.showError(context, 'No se ha podido completar la venta. Error: ${response['message']}');
       }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
+      CustomSnackBar.showError(context, 'Error: $error');
     } finally {
       _paymentIsProcessed(false);
     }
