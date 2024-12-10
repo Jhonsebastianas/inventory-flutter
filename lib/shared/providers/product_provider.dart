@@ -4,6 +4,7 @@ import '../services/api_service.dart'; // Asegúrate de importar el servicio
 import 'dart:convert';
 
 class ProductProvider extends ChangeNotifier {
+  bool isLoading = false;
   List<Product> _products = [];
   List<Product> _filteredProducts = [];
   final ApiService _apiService;
@@ -13,17 +14,24 @@ class ProductProvider extends ChangeNotifier {
   }
 
   List<Product> get products => _products;
-  List<Product> get filteredProducts => _filteredProducts.isEmpty ? _products : _filteredProducts;
+  List<Product> get filteredProducts =>
+      _filteredProducts.isEmpty ? _products : _filteredProducts;
 
   // Cargar productos desde la API
   Future<void> fetchProducts() async {
-    final response = await _apiService.getProducts();
-    if (response.statusCode == 200) {
-      List data = jsonDecode(response.body);
-      _products = data.map((product) => Product.fromJson(product)).toList();
+    isLoading = true;
+    try {
+      final response = await _apiService.getProducts();
+      if (response.statusCode == 200) {
+        List data = jsonDecode(response.body);
+        _products = data.map((product) => Product.fromJson(product)).toList();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load products');
+      }
+    } finally {
+      isLoading = false;
       notifyListeners();
-    } else {
-      throw Exception('Failed to load products');
     }
   }
 
@@ -41,7 +49,8 @@ class ProductProvider extends ChangeNotifier {
 
   // Actualizar un producto existente
   Future<void> updateProduct(String id, Product updatedProduct) async {
-    final response = await _apiService.updateProduct(id, updatedProduct.toJson());
+    final response =
+        await _apiService.updateProduct(id, updatedProduct.toJson());
     if (response.statusCode == 200) {
       int index = _products.indexWhere((prod) => prod.id == id);
       if (index != -1) {
@@ -69,7 +78,8 @@ class ProductProvider extends ChangeNotifier {
     final response = await _apiService.searchProducts(query);
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
-      _filteredProducts = data.map((product) => Product.fromJson(product)).toList();
+      _filteredProducts =
+          data.map((product) => Product.fromJson(product)).toList();
       notifyListeners();
     } else {
       throw Exception('Failed to search products');
