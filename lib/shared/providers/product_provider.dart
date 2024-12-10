@@ -9,9 +9,7 @@ class ProductProvider extends ChangeNotifier {
   List<Product> _filteredProducts = [];
   final ApiService _apiService;
 
-  ProductProvider(this._apiService) {
-    fetchProducts();
-  }
+  ProductProvider(this._apiService);
 
   List<Product> get products => _products;
   List<Product> get filteredProducts =>

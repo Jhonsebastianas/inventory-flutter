@@ -33,12 +33,25 @@ class _SalesScreenState extends State<SalesScreen> {
   bool _isSearching = false;
   bool _isLoading = false; // Estado de carga
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
   // Método para buscar productos
   void _searchProduct(String query) {
     setState(() {
       _isSearching = query.isNotEmpty;
     });
     Provider.of<ProductProvider>(context, listen: false).searchProducts(query);
+  }
+
+  void _loadProducts() {
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+    productProvider
+        .fetchProducts(); // Llama a la función para obtener productos
   }
 
   // Función para reiniciar el estado de la pantalla
@@ -52,7 +65,7 @@ class _SalesScreenState extends State<SalesScreen> {
       _clientData = null;
       _returned = 0;
       _receiptFile = null;
-      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+      Provider.of<ProductProvider>(context, listen: true).fetchProducts();
     });
   }
 
@@ -379,6 +392,7 @@ class _SalesScreenState extends State<SalesScreen> {
   @override
   Widget build(BuildContext context) {
     bool _customTileExpanded = false;
+    _loadProducts();
     var productProvider = Provider.of<ProductProvider>(context);
     var filteredProducts = productProvider.filteredProducts;
 
