@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/core/screens/error_404_screen.dart';
 import 'package:hola_mundo/modules/account/screens/account_settings_screen.dart';
 import 'package:hola_mundo/modules/auth/screens/login_screen.dart';
 import 'package:hola_mundo/modules/products/screens/product_form_screen.dart';
@@ -77,9 +78,7 @@ class AppRoutes {
         );
       default:
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            body: Center(child: Text('No route defined for ${settings.name}')),
-          ),
+          builder: (_) => const Error404Screen(),
         );
     }
   }
