@@ -66,7 +66,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
 
     final salesConsultation = SalesConsultation(
       startDate: _selectedDateRange!.start,
-      endDate: _selectedDateRange!.end,
+      endDate: _selectedDateRange!.end.copyWith(hour: 23, minute: 59, second: 59)
     );
 
     try {
