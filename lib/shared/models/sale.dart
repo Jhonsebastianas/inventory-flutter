@@ -10,7 +10,7 @@ class Sale {
   final List<SaleProduct> products;
   final List<PaymentMethod> paymentMethods;
   final double totalInvoiced;
-  final int totalProducts;
+  final double totalProducts;
   final FileDTO? paymentReceipt;
 
   Sale({
@@ -34,7 +34,7 @@ class Sale {
       products: (json['products'] as List).map((product) => SaleProduct.fromJson(product)).toList(),
       paymentMethods: (json['paymentMethods'] as List).map((method) => PaymentMethod.fromJson(method)).toList(),
       totalInvoiced: json['totalInvoiced'].toDouble(),
-      totalProducts: json['totalProducts'],
+      totalProducts: json['totalProducts'].toDouble(),
       paymentReceipt: json['proofPayment'] != null ? FileDTO.fromJson(json['proofPayment']) : null,
     );
   }

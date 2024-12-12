@@ -20,6 +20,18 @@ class CustomNumberField extends StatelessWidget {
     this.allowDecimals = false, // Valor por defecto
   }) : super(key: key);
 
+  String _normalizeDecimalInput(String input) {
+    // Detecta el separador decimal del sistema
+    final decimalSeparator = RegExp(r'[.,]').firstMatch('1.1')?.group(0) ?? '.';
+
+    // Reemplaza el separador incorrecto
+    if (decimalSeparator == ',') {
+      return input.replaceAll('.', ',');
+    } else {
+      return input.replaceAll(',', '.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -28,14 +40,25 @@ class CustomNumberField extends StatelessWidget {
       keyboardType: allowDecimals
           ? const TextInputType.numberWithOptions(decimal: true)
           : TextInputType.number,
+      onChanged: (value) {
+        if (allowDecimals) {
+          final normalizedValue = _normalizeDecimalInput(value);
+          controller?.text = normalizedValue;
+          controller?.selection = TextSelection.fromPosition(
+            TextPosition(offset: normalizedValue.length),
+          );
+        }
+      },
       onSaved: onSaved,
       validator: validator ??
           (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor ingrese un valor.';
             }
-            final number =
-                allowDecimals ? double.tryParse(value) : int.tryParse(value);
+            final normalizedValue = _normalizeDecimalInput(value);
+            final number = allowDecimals
+                ? double.tryParse(normalizedValue)
+                : int.tryParse(value);
             if (number == null) {
               return 'Por favor ingrese un valor ${allowDecimals ? "numérico válido" : "entero válido"}.';
             }

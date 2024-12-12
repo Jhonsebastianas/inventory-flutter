@@ -113,7 +113,8 @@ class _SalesScreenState extends State<SalesScreen> {
     setState(() {
       _selectedProducts.removeWhere((prod) => prod.id == product.id);
     });
-    CustomSnackBar.show(context: context, message: '${product.name} eliminado.');
+    CustomSnackBar.show(
+        context: context, message: '${product.name} eliminado.');
     _updateTotal();
   }
 
@@ -242,13 +243,13 @@ class _SalesScreenState extends State<SalesScreen> {
     }
   }
 
-  void _showDeleteConfirmation(BuildContext context, String itemName, Function onDelete) {
+  void _showDeleteConfirmation(
+      BuildContext context, String itemName, Function onDelete) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Confirmación'),
-        content:
-            Text('¿Estás seguro de que deseas eliminar $itemName?'),
+        content: Text('¿Estás seguro de que deseas eliminar $itemName?'),
         actions: [
           CustomButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -515,7 +516,10 @@ class _SalesScreenState extends State<SalesScreen> {
                               product.id), // Asegúrate de usar un ID único
                           direction: DismissDirection.endToStart,
                           confirmDismiss: (direction) async {
-                            _showDeleteConfirmation(context, "el producto ${product.name}", () => { _deleteProduct(product) } );
+                            _showDeleteConfirmation(
+                                context,
+                                "el producto ${product.name}",
+                                () => {_deleteProduct(product)});
                           },
                           background: Container(
                             color: Colors.redAccent,
@@ -551,8 +555,10 @@ class _SalesScreenState extends State<SalesScreen> {
                                                 ),
                                               ),
                                               const SizedBox(height: 4),
-                                              Text('Cantidad: ${product.quantity}'),
-                                              Text('Precio: \$${NumberFormatter.format(context, product.price)}'),
+                                              Text(
+                                                  'Cantidad: ${product.quantity}'),
+                                              Text(
+                                                  'Precio: \$${NumberFormatter.format(context, product.price)}'),
                                             ],
                                           ),
                                         ),
@@ -560,7 +566,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                'Subtotal: \$${NumberFormatter.format(context, subtotal) }',
+                                                'Subtotal: \$${NumberFormatter.format(context, subtotal)}',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -579,7 +585,10 @@ class _SalesScreenState extends State<SalesScreen> {
                                 right: 23,
                                 child: GestureDetector(
                                   onTap: () {
-                                    _showDeleteConfirmation(context, "el producto ${product.name}", () => { _deleteProduct(product) } );
+                                    _showDeleteConfirmation(
+                                        context,
+                                        "el producto ${product.name}",
+                                        () => {_deleteProduct(product)});
                                   },
                                   child: const Icon(
                                     Icons.close,
@@ -605,8 +614,16 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                   children: [
                     const SizedBox(height: 10),
-                    AddClientForm(
-                      onClientUpdated: _handleClientUpdate,
+                    Card(
+                      elevation: 1,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: AddClientForm(
+                        onClientUpdated: _handleClientUpdate,
+                      ),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -661,7 +678,8 @@ class _SalesScreenState extends State<SalesScreen> {
                       vertical: 10.0, horizontal: 15.0),
                   child: Column(
                     children: [
-                      Text('Total: \$${NumberFormatter.format(context, _totalAmount)}',
+                      Text(
+                          'Total: \$${NumberFormatter.format(context, _totalAmount)}',
                           style: const TextStyle(fontSize: 16)),
                       Text(
                         _returned > 0

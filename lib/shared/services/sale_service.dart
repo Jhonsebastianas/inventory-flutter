@@ -73,6 +73,7 @@ class SaleService {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
+      print(data);
       return SalesInquiries.fromJson(data);
     } else {
       throw Exception('Error al obtener las ventas');
