@@ -1,5 +1,6 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/modules/clients/models/register_client.dart';
 import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
 import 'package:hola_mundo/routes/app_routes.dart';
@@ -112,6 +113,7 @@ class _SalesScreenState extends State<SalesScreen> {
     setState(() {
       _selectedProducts.removeWhere((prod) => prod.id == product.id);
     });
+    CustomSnackBar.show(context: context, message: '${product.name} eliminado.');
     _updateTotal();
   }
 
@@ -139,6 +141,7 @@ class _SalesScreenState extends State<SalesScreen> {
               CustomNumberField(
                 controller: quantityController,
                 label: 'Cantidad',
+                allowDecimals: true,
               ),
             ],
           ),
@@ -147,7 +150,7 @@ class _SalesScreenState extends State<SalesScreen> {
               onPressed: () {
                 setState(() {
                   product.price = double.parse(priceController.text);
-                  product.quantity = int.parse(quantityController.text);
+                  product.quantity = double.parse(quantityController.text);
                 });
                 _updateTotal();
                 Navigator.pop(context);
@@ -237,6 +240,34 @@ class _SalesScreenState extends State<SalesScreen> {
     if (_paymentMethods.length == 1) {
       _updateTotal();
     }
+  }
+
+  void _showDeleteConfirmation(BuildContext context, String itemName, Function onDelete) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirmación'),
+        content:
+            Text('¿Estás seguro de que deseas eliminar $itemName?'),
+        actions: [
+          CustomButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            type: ButtonType.flat,
+            text: 'Cancelar',
+          ),
+          CustomButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (onDelete != null) {
+                onDelete!();
+              }
+            },
+            type: ButtonType.flatDanger,
+            text: 'Eliminar',
+          ),
+        ],
+      ),
+    );
   }
 
   // Método para añadir un método de pago
@@ -339,13 +370,16 @@ class _SalesScreenState extends State<SalesScreen> {
         _paymentMethods.fold(0.0, (sum, method) => sum + method.amount);
 
     if (_selectedProducts.isEmpty) {
-      CustomSnackBar.show(context: context, message: 'No hay productos seleccionados.');
+      CustomSnackBar.show(
+          context: context, message: 'No hay productos seleccionados.');
       _paymentIsProcessed(false);
       return;
     }
 
     if (totalPaid < _totalAmount) {
-      CustomSnackBar.show(context: context, message: 'El pago no cubre el valor total de la venta.');
+      CustomSnackBar.show(
+          context: context,
+          message: 'El pago no cubre el valor total de la venta.');
       _paymentIsProcessed(false);
       return;
     }
@@ -379,7 +413,8 @@ class _SalesScreenState extends State<SalesScreen> {
           arguments: {'idSale': saleId, 'isRecent': true},
         );
       } else {
-        CustomSnackBar.showError(context, 'No se ha podido completar la venta. Error: ${response['message']}');
+        CustomSnackBar.showError(context,
+            'No se ha podido completar la venta. Error: ${response['message']}');
       }
     } catch (error) {
       CustomSnackBar.showError(context, 'Error: $error');
@@ -473,22 +508,85 @@ class _SalesScreenState extends State<SalesScreen> {
                       itemCount: _selectedProducts.length,
                       itemBuilder: (context, index) {
                         final product = _selectedProducts[index];
+                        final subtotal = product.price * product.quantity;
 
-                        return ListTile(
-                          title: Text(product.name),
-                          subtitle: Text(
-                            '\$${product.price} - Cantidad: ${product.quantity}',
+                        return Dismissible(
+                          key: ValueKey(
+                              product.id), // Asegúrate de usar un ID único
+                          direction: DismissDirection.endToStart,
+                          confirmDismiss: (direction) async {
+                            _showDeleteConfirmation(context, "el producto ${product.name}", () => { _deleteProduct(product) } );
+                          },
+                          background: Container(
+                            color: Colors.redAccent,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            child: const Icon(Icons.delete,
+                                color: Colors.white, size: 32),
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          child: Stack(
                             children: [
-                              IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () => _editProduct(product),
+                              GestureDetector(
+                                onTap: () => _editProduct(product),
+                                child: Card(
+                                  elevation: 1,
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                product.name,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text('Cantidad: ${product.quantity}'),
+                                              Text('Precio: \$${NumberFormatter.format(context, product.price)}'),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Subtotal: \$${NumberFormatter.format(context, subtotal) }',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => _deleteProduct(product),
+                              // Botón "X" en la esquina superior derecha
+                              Positioned(
+                                top: 15,
+                                right: 23,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showDeleteConfirmation(context, "el producto ${product.name}", () => { _deleteProduct(product) } );
+                                  },
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -498,6 +596,21 @@ class _SalesScreenState extends State<SalesScreen> {
                   ],
                 ),
 
+                // Sección del cliente
+                ExpansionTile(
+                  title: NumOfItems(
+                    icon: const Icon(Icons.person_2_outlined),
+                    numOfItem: _receiptFile != null ? 1 : 0,
+                    title: 'Cliente (opcional)',
+                  ),
+                  children: [
+                    const SizedBox(height: 10),
+                    AddClientForm(
+                      onClientUpdated: _handleClientUpdate,
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
                 // Sección de Métodos de Pago
                 ExpansionTile(
                   title: NumOfItems(
@@ -543,33 +656,17 @@ class _SalesScreenState extends State<SalesScreen> {
                     const SizedBox(height: 8.0),
                   ],
                 ),
-
-                // Sección del cliente
-                ExpansionTile(
-                  title: NumOfItems(
-                    icon: const Icon(Icons.person_2_outlined),
-                    numOfItem: _receiptFile != null ? 1 : 0,
-                    title: 'Cliente (opcional)',
-                  ),
-                  children: [
-                    const SizedBox(height: 10),
-                    AddClientForm(
-                      onClientUpdated: _handleClientUpdate,
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 15.0),
                   child: Column(
                     children: [
-                      Text('Total: \$$_totalAmount',
+                      Text('Total: \$${NumberFormatter.format(context, _totalAmount)}',
                           style: const TextStyle(fontSize: 16)),
                       Text(
                         _returned > 0
-                            ? 'Cambio: \$$_returned'
-                            : 'Falta: \$${_returned.abs()}',
+                            ? 'Cambio: \$${NumberFormatter.format(context, _returned)}'
+                            : 'Falta: \$${NumberFormatter.format(context, _returned.abs())}',
                         style: TextStyle(
                           fontSize: 16,
                           color:
@@ -595,7 +692,7 @@ class _SalesScreenState extends State<SalesScreen> {
               : _completeSale, // Deshabilita el botón si está cargando
           text: _isLoading
               ? 'Procesando...' // Muestra un mensaje de carga
-              : 'Confirmar Venta ($_totalAmount COP)',
+              : 'Confirmar Venta (${NumberFormatter.format(context, _totalAmount)} COP)',
           type: ButtonType.primary,
           minimumSize: const Size(double.infinity, 48),
         ),

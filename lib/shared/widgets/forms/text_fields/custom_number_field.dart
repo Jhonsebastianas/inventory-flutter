@@ -7,6 +7,7 @@ class CustomNumberField extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final void Function(String?)? onSaved;
+  final bool allowDecimals; // Nueva propiedad para permitir decimales
 
   const CustomNumberField({
     Key? key,
@@ -16,6 +17,7 @@ class CustomNumberField extends StatelessWidget {
     this.hintText,
     this.initialValue,
     this.validator,
+    this.allowDecimals = false, // Valor por defecto
   }) : super(key: key);
 
   @override
@@ -23,18 +25,27 @@ class CustomNumberField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       initialValue: initialValue,
-      keyboardType: TextInputType.number,
+      keyboardType: allowDecimals
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : TextInputType.number,
       onSaved: onSaved,
-      validator: validator ?? (value) {
-        if (value == null || double.tryParse(value) == null) {
-          return 'Por favor ingrese un valor numérico válido.';
-        }
-        return null;
-      },
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor ingrese un valor.';
+            }
+            final number =
+                allowDecimals ? double.tryParse(value) : int.tryParse(value);
+            if (number == null) {
+              return 'Por favor ingrese un valor ${allowDecimals ? "numérico válido" : "entero válido"}.';
+            }
+            return null;
+          },
       decoration: InputDecoration(
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(width: 6, color: Colors.black)),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(width: 6, color: Colors.black),
+        ),
         hintText: hintText,
         labelText: label,
         labelStyle: const TextStyle(color: Colors.black),

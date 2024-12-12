@@ -21,7 +21,6 @@ class ClientDTO {
   });
 
   factory ClientDTO.fromJson(Map<String, dynamic> json) {
-    print("ClientDTO");
     return ClientDTO(
       id: json['id'],
       businessId: json['businessId'],

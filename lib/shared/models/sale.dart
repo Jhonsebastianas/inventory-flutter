@@ -45,7 +45,7 @@ class SaleProduct {
   final String name;
   final String? description;
   double price;
-  int quantity;
+  double quantity;
 
   // Convertir objeto Sale a JSON
   Map<String, dynamic> toJson() {
@@ -62,7 +62,7 @@ class SaleProduct {
       id: json['idProducto'],
       name: json['name'],
       price: json['price'].toDouble(),
-      quantity: json['quantity'].toInt(),
+      quantity: json['quantity'].toDouble(),
     );
   }
 
