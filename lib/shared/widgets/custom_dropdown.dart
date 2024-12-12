@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomDropdown extends StatefulWidget {
+class CustomDropdownOur extends StatefulWidget {
   final String? value;
   final String label;
   final List<DropdownMenuItem<String>> items;
@@ -10,7 +10,7 @@ class CustomDropdown extends StatefulWidget {
   final bool? enabled;
   final String? hint;
 
-  const CustomDropdown({
+  const CustomDropdownOur({
     Key? key,
     required this.label,
     required this.items,
@@ -23,10 +23,10 @@ class CustomDropdown extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomDropdownState createState() => _CustomDropdownState();
+  _CustomDropdownOurState createState() => _CustomDropdownOurState();
 }
 
-class _CustomDropdownState extends State<CustomDropdown> {
+class _CustomDropdownOurState extends State<CustomDropdownOur> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(

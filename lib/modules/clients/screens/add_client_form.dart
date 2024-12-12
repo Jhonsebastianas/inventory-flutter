@@ -10,8 +10,9 @@ import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.da
 
 class AddClientForm extends StatefulWidget {
   final Function(RegisterClient) onClientUpdated;
+  RegisterClient? currentClient;
 
-  const AddClientForm({Key? key, required this.onClientUpdated})
+  AddClientForm({Key? key, required this.onClientUpdated, this.currentClient})
       : super(key: key);
 
   @override
@@ -24,7 +25,7 @@ class _AddClientFormState extends State<AddClientForm> {
   bool _isLoading = false;
   bool _existsSearch = false;
 
-  RegisterClient? _currentClient;
+  late RegisterClient _currentClient;
 
   String? selectedDocumentType = '1';
   TextEditingController _idNumberController = TextEditingController();
@@ -39,10 +40,16 @@ class _AddClientFormState extends State<AddClientForm> {
   }
 
   void _initializeClient() {
-    _currentClient = RegisterClient();
-    _currentClient!.identification = IdentificationDocumentDTO();
-    _currentClient!.identification!.type = TypeIdentificationDTO();
-    _currentClient!.contact = ContactDTO();
+    _currentClient = widget.currentClient ?? RegisterClient();
+    _currentClient.identification ??= IdentificationDocumentDTO();
+    _currentClient.identification!.type ??= TypeIdentificationDTO();
+    _currentClient.contact ??= ContactDTO();
+
+    // Actualizar campos con datos del cliente actual
+    _idNumberController.text = _currentClient.identification?.value ?? '';
+    _namesController.text = _currentClient.names ?? '';
+    _lastNamesController.text = _currentClient.lastnames ?? '';
+    _emailController.text = _currentClient.contact?.email ?? '';
   }
 
   void _checkClient() async {
@@ -64,25 +71,41 @@ class _AddClientFormState extends State<AddClientForm> {
       if (clientData != null) {
         setState(() {
           _isClientFound = true;
+          // Actualizar los datos del cliente con los encontrados
           _namesController.text = clientData.names ?? '';
           _lastNamesController.text = clientData.lastnames ?? '';
           _emailController.text = clientData.contact?.email ?? '';
           _currentClient = clientData;
         });
-        widget.onClientUpdated(clientData);
+        widget.onClientUpdated(
+            clientData); // Actualiza el cliente en el widget principal
       } else {
+        // Si no lo encontramos, lo consideramos como nuevo cliente
         setState(() {
           _isClientFound = false;
+          _currentClient.identification?.value = _idNumberController.text;
           _clearClientFields();
         });
+        widget.onClientUpdated(
+            _currentClient); // Actualiza el cliente vacío en el widget principal
       }
     }
   }
 
   void _saveClient() {
     if (_formKey.currentState!.validate()) {
-      // Simulación de guardado en backend
-      widget.onClientUpdated(_currentClient!);
+      // Actualizar datos del cliente antes de pasarlos al padre
+      _currentClient.names = _namesController.text;
+      _currentClient.lastnames = _lastNamesController.text;
+      _currentClient.contact?.email = _emailController.text;
+      _currentClient.identification?.value = _idNumberController.text;
+
+      // Si el cliente no ha sido encontrado, es un nuevo cliente, lo agregamos al padre
+      if (!_isClientFound) {
+        widget.onClientUpdated(
+            _currentClient); // Actualiza el cliente en el widget principal
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cliente guardado exitosamente')),
       );
@@ -93,6 +116,27 @@ class _AddClientFormState extends State<AddClientForm> {
     _namesController.clear();
     _lastNamesController.clear();
     _emailController.clear();
+  }
+
+  void _updateParentClient() {
+    _currentClient
+      ..names = _namesController.text
+      ..lastnames = _lastNamesController.text
+      ..contact?.email = _emailController.text
+      ..identification?.value = _idNumberController.text;
+
+    widget.onClientUpdated(_currentClient);
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'El correo electrónico es obligatorio';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Por favor, introduce un correo electrónico válido';
+    }
+    return null;
   }
 
   @override
@@ -111,7 +155,7 @@ class _AddClientFormState extends State<AddClientForm> {
                 Row(
                   children: [
                     Expanded(
-                      child: CustomDropdown(
+                      child: CustomDropdownOur(
                         label: 'Tipo documento',
                         value: selectedDocumentType,
                         items: const [
@@ -131,6 +175,7 @@ class _AddClientFormState extends State<AddClientForm> {
                       child: CustomTextField(
                         controller: _idNumberController,
                         label: 'Número de Identificación',
+                        onChanged: (value) => _updateParentClient(),
                       ),
                     ),
                   ],
@@ -143,42 +188,44 @@ class _AddClientFormState extends State<AddClientForm> {
                   minimumSize: const Size(double.infinity, 48),
                 ),
                 const SizedBox(height: 20),
-                if (_existsSearch)
-                  if (_isClientFound || !_isClientFound) ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextField(
-                            controller: _namesController,
-                            label: 'Nombres',
-                            enabled: !_isClientFound,
-                          ),
+                if (_isClientFound || !_isClientFound) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _namesController,
+                          label: 'Nombres',
+                          enabled: !_isClientFound,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Los nombres son obligatorios'
+                              : null,
+                          onChanged: (value) => _updateParentClient(),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: CustomTextField(
-                            controller: _lastNamesController,
-                            label: 'Apellidos',
-                            enabled: !_isClientFound,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextField(
-                      controller: _emailController,
-                      label: 'Email',
-                      enabled: !_isClientFound,
-                    ),
-                    const SizedBox(height: 20),
-                    if (!_isClientFound)
-                      CustomButton(
-                        text: 'Registrar cliente',
-                        type: ButtonType.primary,
-                        onPressed: _saveClient,
-                        minimumSize: const Size(double.infinity, 48),
                       ),
-                  ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _lastNamesController,
+                          label: 'Apellidos',
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Los apellidos son obligatorios'
+                              : null,
+                          enabled: !_isClientFound,
+                          onChanged: (value) => _updateParentClient(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    validator: _validateEmail,
+                    enabled: !_isClientFound,
+                    onChanged: (value) => _updateParentClient(),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ],
             ),
           ),

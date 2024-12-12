@@ -4,9 +4,13 @@ import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/modules/clients/models/register_client.dart';
 import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
 import 'package:hola_mundo/routes/app_routes.dart';
+import 'package:hola_mundo/shared/models/contact_dto.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
+import 'package:hola_mundo/shared/models/identification_document_dto.dart';
+import 'package:hola_mundo/shared/models/type_identification_dto.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/custom_dropdown.dart';
 import 'package:hola_mundo/shared/widgets/custom_snake_bar.dart';
 import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:image_picker/image_picker.dart'; // Importa image_picker
@@ -34,9 +38,29 @@ class _SalesScreenState extends State<SalesScreen> {
   bool _isSearching = false;
   bool _isLoading = false; // Estado de carga
 
+  List<DropdownMenuItem<String>> itemsPaymentMethods = const [
+    DropdownMenuItem(
+      child: Text('Efectivo'),
+      value: 'Efectivo',
+    ),
+    DropdownMenuItem(
+      child: Text('Transferencia'),
+      value: 'Transferencia',
+    ),
+    DropdownMenuItem(
+      child: Text('Tarjeta'),
+      value: 'Tarjeta',
+    ),
+    DropdownMenuItem(
+      child: Text('Otro'),
+      value: 'Otro',
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
+    initClientData();
     _loadProducts();
   }
 
@@ -57,17 +81,42 @@ class _SalesScreenState extends State<SalesScreen> {
 
   // Función para reiniciar el estado de la pantalla
   void resetScreenState() {
+    initClientData();
     setState(() {
       _selectedProducts.clear();
       _selectedProducts = [];
       _totalAmount = 0.0;
       _paymentMethods = [];
       _isSearching = false;
-      _clientData = null;
       _returned = 0;
       _receiptFile = null;
-      Provider.of<ProductProvider>(context, listen: true).fetchProducts();
+      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
     });
+  }
+
+  void initClientData() {
+    setState(() {
+      _clientData = RegisterClient();
+      _clientData!.identification ??= IdentificationDocumentDTO();
+      _clientData!.identification!.type ??= TypeIdentificationDTO();
+      _clientData!.contact ??= ContactDTO();
+    });
+  }
+
+  bool isValidClient(RegisterClient? client) {
+    if (client == null) return false;
+
+    // Validar que nombres y apellidos no sean nulos ni vacíos
+    if (client.names == null || client.names!.isEmpty) return false;
+    if (client.lastnames == null || client.lastnames!.isEmpty) return false;
+
+    // Validar el contacto (email en este caso)
+    if (client.contact == null) return false;
+    if (client.contact!.email == null || client.contact!.email!.isEmpty)
+      return false;
+
+    // Si pasa todas las validaciones, entonces es válido
+    return true;
   }
 
   // Método para actualizar el total
@@ -179,27 +228,10 @@ class _SalesScreenState extends State<SalesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              DropdownButtonFormField<String>(
+              CustomDropdownOur(
+                label: 'Forma de pago',
+                items: itemsPaymentMethods,
                 value: selectedPaymentType,
-                decoration: const InputDecoration(labelText: 'Forma de pago'),
-                items: [
-                  DropdownMenuItem(
-                    child: Text('Efectivo'),
-                    value: 'Efectivo',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Transferencia'),
-                    value: 'Transferencia',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Tarjeta'),
-                    value: 'Tarjeta',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Otro'),
-                    value: 'Otro',
-                  ),
-                ],
                 onChanged: (value) {
                   setState(() {
                     selectedPaymentType =
@@ -207,10 +239,11 @@ class _SalesScreenState extends State<SalesScreen> {
                   });
                 },
               ),
-              TextField(
+              const SizedBox(height: 10),
+              CustomNumberField(
                 controller: amountController,
-                decoration: const InputDecoration(labelText: 'Monto'),
-                keyboardType: TextInputType.number,
+                label: 'Monto',
+                allowDecimals: true,
               ),
             ],
           ),
@@ -273,7 +306,8 @@ class _SalesScreenState extends State<SalesScreen> {
 
   // Método para añadir un método de pago
   void _addPaymentMethod() {
-    String? selectedPaymentType; // Variable de estado para el tipo de pago
+    String? selectedPaymentType =
+        "Efectivo"; // Variable de estado para el tipo de pago
     TextEditingController amountController = TextEditingController();
 
     showDialog(
@@ -284,38 +318,19 @@ class _SalesScreenState extends State<SalesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              DropdownButtonFormField<String>(
+              CustomDropdownOur(
+                label: 'Forma de pago',
+                items: itemsPaymentMethods,
                 value: selectedPaymentType,
-                decoration: const InputDecoration(labelText: 'Forma de pago'),
-                items: [
-                  DropdownMenuItem(
-                    child: Text('Efectivo'),
-                    value: 'Efectivo',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Transferencia'),
-                    value: 'Transferencia',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Tarjeta'),
-                    value: 'Tarjeta',
-                  ),
-                  DropdownMenuItem(
-                    child: Text('Otro'),
-                    value: 'Otro',
-                  ),
-                ],
                 onChanged: (value) {
-                  setState(() {
-                    selectedPaymentType =
-                        value; // Actualiza el estado con el tipo de pago seleccionado
-                  });
+                  setState(() => selectedPaymentType = value);
                 },
               ),
-              TextField(
+              const SizedBox(height: 10),
+              CustomNumberField(
                 controller: amountController,
-                decoration: const InputDecoration(labelText: 'Monto'),
-                keyboardType: TextInputType.number,
+                label: 'Monto',
+                allowDecimals: true,
               ),
             ],
           ),
@@ -386,6 +401,10 @@ class _SalesScreenState extends State<SalesScreen> {
     }
 
     // Construir el objeto de la venta
+    RegisterClient? clientToSend = _clientData;
+    if (!isValidClient(clientToSend)) {
+      clientToSend = null;
+    }
     Map<String, dynamic> sale = {
       'products': _selectedProducts.map((product) => product.toJson()).toList(),
       'paymentMethods':
@@ -393,7 +412,7 @@ class _SalesScreenState extends State<SalesScreen> {
       'proofPayment': _receiptFile != null
           ? (await createFileDTO(File(_receiptFile!.path))).toMap()
           : null,
-      'client': _clientData != null ? _clientData?.toJson() : null,
+      'client': (clientToSend != null) ? clientToSend.toJson() : null,
     };
 
     // Consumir el servicio de creación de venta
@@ -615,6 +634,7 @@ class _SalesScreenState extends State<SalesScreen> {
                   children: [
                     const SizedBox(height: 10),
                     AddClientForm(
+                      currentClient: _clientData,
                       onClientUpdated: _handleClientUpdate,
                     ),
                     const SizedBox(height: 10),

@@ -69,13 +69,19 @@ class AppRoutes {
       case salesHistory:
         return MaterialPageRoute(builder: (_) => SalesListScreen());
       case saleDetail:
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-          builder: (_) => SaleDetailScreen(
-            idSale: args['idSale'],
-            isRecent: args['isRecent'],
-          ),
-        );
+        if (settings.arguments is Map<String, dynamic>) {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => SaleDetailScreen(
+              idSale: args['idSale'],
+              isRecent: args['isRecent'],
+            ),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder: (_) => const Error404Screen(),
+          );
+        }
       default:
         return MaterialPageRoute(
           builder: (_) => const Error404Screen(),
