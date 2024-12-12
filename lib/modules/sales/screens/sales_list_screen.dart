@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/core/utils/date_util_helper.dart';
 import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/sales_consultation.dart';
 import 'package:hola_mundo/shared/models/sales_inquiries.dart';
@@ -32,11 +33,11 @@ class _SalesListScreenState extends State<SalesListScreen> {
         _sales = null; // Indicar que se está cargando
       });
       _selectedDateRange = DateTimeRange(
-          start: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-          end: DateTime.now().copyWith(hour: 23, minute: 59, second: 59));
+          start: DateUtilsHelper.startOfDay(DateTime.now()),
+          end: DateUtilsHelper.endOfDay(DateTime.now()));
       final salesConsultation = SalesConsultation(
-        startDate: _selectedDateRange!.start,
-        endDate: _selectedDateRange!.end,
+        startDate: _selectedDateRange!.start.toUtc(),
+        endDate: _selectedDateRange!.end.toUtc(),
       );
       // Llamar a la API
       final inquiries =
@@ -65,8 +66,8 @@ class _SalesListScreenState extends State<SalesListScreen> {
     }
 
     final salesConsultation = SalesConsultation(
-      startDate: _selectedDateRange!.start,
-      endDate: _selectedDateRange!.end.copyWith(hour: 23, minute: 59, second: 59)
+      startDate: DateUtilsHelper.startOfDay(_selectedDateRange!.start).toUtc(),
+      endDate: DateUtilsHelper.endOfDay(_selectedDateRange!.end).toUtc()
     );
 
     try {
@@ -232,7 +233,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
                       context,
                       icon: Icons.calendar_today_outlined,
                       label: 'Fecha:',
-                      value: sale.createdAt.toLocal().toString().split(' ')[0],
+                      value: DateUtilsHelper.formatDate(sale.createdAt.toLocal(), format: DateUtilsHelper.yearMonthDayTimeAmPmFormat),
                     ),
                   ],
                 ),
