@@ -36,7 +36,6 @@ class ProductProvider extends ChangeNotifier {
   // Agregar un nuevo producto
   Future<void> addProduct(Product product) async {
     final response = await _apiService.createProduct(product.toJson());
-    print(response.body);
     if (response.statusCode == 201) {
       _products.add(product);
       notifyListeners();

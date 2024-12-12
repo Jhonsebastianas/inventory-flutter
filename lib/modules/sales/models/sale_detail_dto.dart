@@ -14,7 +14,7 @@ class SaleDetailDTO {
   List<SaleProduct> products;
   List<PaymentMethod> paymentMethods;
   double totalInvoiced;
-  int totalProducts;
+  double totalProducts;
   String proofPayment;
   bool? isRecent; // Campo opcional
 
@@ -54,7 +54,7 @@ class SaleDetailDTO {
     products: (json['products'] as List?)?.map((product) => SaleProduct.fromJson(product)).toList() ?? [],
     paymentMethods: (json['paymentMethods'] as List?)?.map((method) => PaymentMethod.fromJson(method)).toList() ?? [],
     totalInvoiced: (json['totalInvoiced'] as num?)?.toDouble() ?? 0.0, // Maneja valores nulos y conversiones seguras
-    totalProducts: json['totalProducts'] ?? 0,
+    totalProducts: json['totalProducts'].toDouble() ?? 0,
     proofPayment: json['proofPayment'] ?? '', // Usa un valor predeterminado
     isRecent: json['isRecent'] ?? false, // Asume falso si no está definido
   );

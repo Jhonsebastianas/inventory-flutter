@@ -38,7 +38,6 @@ class SaleService {
   // Obtener ventas por mes
   Future<List<Sale>> getSalesByMonth(int year, int month) async {
     final token = await _getToken();
-    print("vamos a consular");
     final response = await http.get(
       // Uri.parse('$baseUrl/sales?year=$year&month=$month')
       Uri.parse('$baseUrl/sales'),
@@ -51,8 +50,6 @@ class SaleService {
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      print(data);
-      print("VAMOS A MAPEAR");
       return data.map((sale) => Sale.fromJson(sale)).toList();
     } else {
       throw Exception('Error al obtener las ventas');
@@ -73,7 +70,6 @@ class SaleService {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      print(data);
       return SalesInquiries.fromJson(data);
     } else {
       throw Exception('Error al obtener las ventas');

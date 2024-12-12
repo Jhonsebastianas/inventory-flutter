@@ -30,7 +30,6 @@ class ClientService {
         },
       );
 
-      print('Codigo: ${response.statusCode}');
       if (response.statusCode == 200) {
         // Validar si el cuerpo de la respuesta está vacío
         if (response.body.isEmpty || response.body == 'null') {
