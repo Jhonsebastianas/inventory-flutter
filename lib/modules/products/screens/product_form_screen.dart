@@ -20,7 +20,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late String _name;
   late String _description;
   late double _price;
-  late int _stock;
+  late double _stock;
   late double _percentageTax;
   List<StockDetail> _stockDetails = [];
   late double _weightedAveragePurchasePrice;
@@ -41,7 +41,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _name = '';
       _description = '';
       _price = 0.0;
-      _stock = 0;
+      _stock = 0.0;
       _percentageTax = 0;
       _stockDetails = [];
       _weightedAveragePurchasePrice = 0.0;
@@ -86,7 +86,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   // STOCK INFORMATION
   void updateStock() {
-    int totalStock = 0;
+    double totalStock = 0;
     double sumTotalPurchasePrices = 0;
     for (var stockSum in _stockDetails) {
       totalStock += stockSum.quantity;
@@ -143,7 +143,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               onPressed: () {
                 final provider = _providerController.text;
                 final price = double.tryParse(_priceController.text) ?? 0.0;
-                final quantity = int.tryParse(_quantityController.text) ?? 0;
+                final quantity = double.tryParse(_quantityController.text) ?? 0.0;
 
                 if (quantity == 0 || price == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(

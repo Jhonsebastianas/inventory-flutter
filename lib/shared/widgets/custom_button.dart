@@ -7,7 +7,7 @@ class CustomButton extends StatelessWidget {
   final String text;
   final ButtonType type;
   final Icon? icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isEnabled;
   final Size? minimumSize;
 
@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
     Key? key,
     required this.text,
     required this.type,
-    required this.onPressed,
+    this.onPressed,
     this.icon,
     this.minimumSize,
     this.isEnabled = true,

@@ -614,16 +614,8 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                   children: [
                     const SizedBox(height: 10),
-                    Card(
-                      elevation: 1,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: AddClientForm(
-                        onClientUpdated: _handleClientUpdate,
-                      ),
+                    AddClientForm(
+                      onClientUpdated: _handleClientUpdate,
                     ),
                     const SizedBox(height: 10),
                   ],
