@@ -6,6 +6,7 @@ import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/sale.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
+import 'package:hola_mundo/shared/widgets/custom_snake_bar.dart';
 import 'package:http/http.dart' as http;
 
 class SaleDetailScreen extends StatefulWidget {
@@ -45,6 +46,15 @@ class _SaleDetailScreenState extends State<SaleDetailScreen> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_square),
+            onPressed: () {
+              // Implementar lógica de modificación
+              CustomSnackBar.showInfo(context, 'Opción en construcción 🏗️');
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<SaleDetailDTO>(
         future: saleDetailFuture,
@@ -100,15 +110,10 @@ class _SaleDetailScreenState extends State<SaleDetailScreen> {
           _buildPaymentMethodsCard(saleDetail.paymentMethods),
           const SizedBox(height: 16),
           CustomButton(
-            icon: const Icon(Icons.edit),
             type: ButtonType.primary,
-            text: 'Modificar Venta',
+            text: 'Volver',
             onPressed: () {
-              // Implementar lógica de modificación
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Opción en construcción 🏗️',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
-              );
+              Navigator.pop(context);
             },
             minimumSize: const Size(double.infinity, 48),
           ),
