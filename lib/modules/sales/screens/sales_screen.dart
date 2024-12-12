@@ -687,26 +687,26 @@ class _SalesScreenState extends State<SalesScreen> {
                     ],
                   ),
                 ),
+                Container(
+                  height: 50,
+                  margin: const EdgeInsets.all(10),
+                  child: CustomButton(
+                    onPressed: _isLoading
+                        ? () {}
+                        : _completeSale, // Deshabilita el botón si está cargando
+                    text: _isLoading
+                        ? 'Procesando...' // Muestra un mensaje de carga
+                        : 'Confirmar Venta (${NumberFormatter.format(context, _totalAmount)} COP)',
+                    type: ButtonType.primary,
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                ),
               ],
             ),
           ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        height: 50,
-        margin: const EdgeInsets.all(10),
-        child: CustomButton(
-          onPressed: _isLoading
-              ? () {}
-              : _completeSale, // Deshabilita el botón si está cargando
-          text: _isLoading
-              ? 'Procesando...' // Muestra un mensaje de carga
-              : 'Confirmar Venta (${NumberFormatter.format(context, _totalAmount)} COP)',
-          type: ButtonType.primary,
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
     );
   }
 }

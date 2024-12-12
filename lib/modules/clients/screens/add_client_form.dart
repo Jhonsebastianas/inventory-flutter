@@ -22,6 +22,7 @@ class _AddClientFormState extends State<AddClientForm> {
   final _formKey = GlobalKey<FormState>();
   bool _isClientFound = false;
   bool _isLoading = false;
+  bool _existsSearch = false;
 
   RegisterClient? _currentClient;
 
@@ -55,7 +56,10 @@ class _AddClientFormState extends State<AddClientForm> {
       final clientData =
           await clientService.findClientByIdentification(idType, idNumber);
 
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _existsSearch = true;
+      });
 
       if (clientData != null) {
         setState(() {
@@ -139,39 +143,42 @@ class _AddClientFormState extends State<AddClientForm> {
                   minimumSize: const Size(double.infinity, 48),
                 ),
                 const SizedBox(height: 20),
-                if (_isClientFound || !_isClientFound) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextField(
-                          controller: _namesController,
-                          label: 'Nombres',
-                          enabled: !_isClientFound,
+                if (_existsSearch)
+                  if (_isClientFound || !_isClientFound) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _namesController,
+                            label: 'Nombres',
+                            enabled: !_isClientFound,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: CustomTextField(
-                          controller: _lastNamesController,
-                          label: 'Apellidos',
-                          enabled: !_isClientFound,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _lastNamesController,
+                            label: 'Apellidos',
+                            enabled: !_isClientFound,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    enabled: !_isClientFound,
-                  ),
-                  const SizedBox(height: 20),
-                  if (!_isClientFound)
-                    ElevatedButton(
-                      onPressed: _saveClient,
-                      child: const Text('Guardar'),
+                      ],
                     ),
-                ],
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _emailController,
+                      label: 'Email',
+                      enabled: !_isClientFound,
+                    ),
+                    const SizedBox(height: 20),
+                    if (!_isClientFound)
+                      CustomButton(
+                        text: 'Registrar cliente',
+                        type: ButtonType.primary,
+                        onPressed: _saveClient,
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                  ],
               ],
             ),
           ),

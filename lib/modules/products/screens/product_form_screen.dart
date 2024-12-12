@@ -296,6 +296,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       child: CustomNumberField(
                         initialValue: _price.toString(),
                         label: 'Precio de Venta',
+                        allowDecimals: true,
                         onSaved: (value) => _price = double.parse(value!),
                         validator: (value) {
                           if (value == null || double.tryParse(value) == null) {
@@ -309,6 +310,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     Expanded(
                       child: CustomNumberField(
                         initialValue: _percentageTax.toString(),
+                        allowDecimals: true,
                         label: 'IVA (%)',
                         onSaved: (value) =>
                             _percentageTax = double.parse(value!),
