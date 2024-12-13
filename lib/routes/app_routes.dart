@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hola_mundo/core/screens/error_404_screen.dart';
 import 'package:hola_mundo/modules/account/screens/account_settings_screen.dart';
 import 'package:hola_mundo/modules/auth/screens/login_screen.dart';
+import 'package:hola_mundo/modules/financial/screens/finances_screen.dart';
 import 'package:hola_mundo/modules/products/screens/product_form_screen.dart';
 import 'package:hola_mundo/modules/products/screens/product_list_screen.dart';
 import 'package:hola_mundo/modules/sales/screens/sale_detail_screen.dart';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String sales = '/sales';
   static const String saleDetail = '/sales/detail';
   static const String salesHistory = '/sales/history';
+  static const String finances = '/finances';
 
   // Función para validar el estado del login
   static Future<bool> checkLoginStatus() async {
@@ -68,6 +70,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => SalesScreen());
       case salesHistory:
         return MaterialPageRoute(builder: (_) => SalesListScreen());
+      case finances:
+        return MaterialPageRoute(builder: (_) => const FinanceScreen());
       case saleDetail:
         if (settings.arguments is Map<String, dynamic>) {
           final args = settings.arguments as Map<String, dynamic>;

@@ -118,6 +118,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           context, AppRoutes.salesHistory);
                     },
                   ),
+                  _buildCard(
+                    context,
+                    title: 'Estado financiero',
+                    icon: Icons.monetization_on,
+                    color: Colors.green,
+                    onTap: () {
+                      AppRoutes.onTabChangeRoute(
+                          context, AppRoutes.finances);
+                    },
+                  ),
                 ],
               ),
             ),
