@@ -170,7 +170,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
     );
   }
 
-  // Widget para las tarjetas de resumen real
+  // Widget para las tarjetas de resumen
   Widget _buildSummaryCard({
     required String title,
     required double revenue,
@@ -180,34 +180,55 @@ class _FinanceScreenState extends State<FinanceScreen> {
     final revenueContribution =
         totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
     final profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       elevation: 4.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
               style: const TextStyle(
-                fontSize: 20.0,
+                fontSize: 24.0, // Incremento del tamaño de fuente
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8.0),
-            Text("Ingresos: \$${NumberFormatter.format(context, revenue)}"),
-            Text("Ganancias: \$${NumberFormatter.format(context, profit)}"),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 12.0),
+            Text(
+              "Ingresos: \$${NumberFormatter.format(context, revenue)}",
+              style: const TextStyle(
+                fontSize: 18.0, // Tamaño más grande para valores
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            Text(
+              "Ganancias: \$${NumberFormatter.format(context, profit)}",
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 12.0),
             Text(
               "Margen de Ganancia: ${profitMargin.toStringAsFixed(2)}%",
               style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
                 color: profitMargin >= 0 ? Colors.green : Colors.red,
               ),
             ),
             Text(
               "Contribución al Total: ${revenueContribution.toStringAsFixed(2)}%",
-              style: const TextStyle(color: Colors.blue),
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: Colors.blue,
+              ),
             ),
           ],
         ),
@@ -215,42 +236,56 @@ class _FinanceScreenState extends State<FinanceScreen> {
     );
   }
 
+// Widget para la tarjeta de resumen total
   Widget _buildTotalCard({
     required double totalRevenue,
     required double totalProfit,
   }) {
     final totalProfitMargin =
         totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+
     return Card(
       color: Colors.blueAccent,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       elevation: 4.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               "Resumen Total",
               style: TextStyle(
-                fontSize: 20.0,
+                fontSize: 24.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 12.0),
             Text(
               "Ingresos Totales: \$${NumberFormatter.format(context, totalRevenue)}",
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             Text(
               "Ganancias Totales: \$${NumberFormatter.format(context, totalProfit)}",
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.lightGreenAccent,
+              ),
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 12.0),
             Text(
               "Margen de Ganancia Total: ${totalProfitMargin.toStringAsFixed(2)}%",
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: Colors.white70,
+              ),
             ),
           ],
         ),
