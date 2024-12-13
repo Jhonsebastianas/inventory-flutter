@@ -22,6 +22,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       backgroundColor: Colors.orange,
+      duration: const Duration(seconds: 20),
     );
   }
 

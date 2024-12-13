@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/modules/clients/models/register_client.dart';
 import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
+import 'package:hola_mundo/modules/products/models/information_reduction_inventory_dto.dart';
 import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/contact_dto.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
@@ -421,16 +422,37 @@ class _SalesScreenState extends State<SalesScreen> {
       final response = await saleService.createSale(sale);
 
       if (response['statusCode'] == 201) {
-        final saleId = response['data']; // Obtiene el ID de la venta
+        print(response['data']);
+        final CreateSaleOutDTO saleOut =
+            CreateSaleOutDTO.fromJson(response['data']);
         // Venta creada exitosamente
         CustomSnackBar.showSuccess(context, '¡Venta realizada con éxito!');
+
+        // Filtrar productos con stock bajo el límite
+        final lowStockProducts = saleOut.informationReductionInventory
+            .where((inventory) => inventory.isExistenceBelowLimit)
+            .toList();
+
+        if (lowStockProducts.isNotEmpty) {
+          // Crear un mensaje con los nombres de productos y su stock actual
+          final lowStockMessage = lowStockProducts
+              .map((inventory) =>
+                  '${inventory.productName}: ${inventory.newStock}')
+              .join('\n');
+
+          // Mostrar un mensaje de advertencia
+          CustomSnackBar.showWarning(
+            context,
+            '¡Atención! Los siguientes productos tienen stock bajo el límite:\n$lowStockMessage',
+          );
+        }
 
         resetScreenState();
         // Aquí puedes usar `saleId` para redirigir al detalle, guardar en local, etc.
         Navigator.pushNamed(
           context,
           AppRoutes.saleDetail,
-          arguments: {'idSale': saleId, 'isRecent': true},
+          arguments: {'idSale': saleOut.idSale, 'isRecent': true},
         );
       } else {
         CustomSnackBar.showError(context,
