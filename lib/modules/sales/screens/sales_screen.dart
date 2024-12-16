@@ -1,5 +1,6 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/core/utils/date_util_helper.dart';
 import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/modules/clients/models/register_client.dart';
 import 'package:hola_mundo/modules/clients/screens/add_client_form.dart';
@@ -38,6 +39,8 @@ class _SalesScreenState extends State<SalesScreen> {
   final ImagePicker _picker = ImagePicker(); // Instancia de ImagePicker
   bool _isSearching = false;
   bool _isLoading = false; // Estado de carga
+
+  DateTime _selectedDate = DateTime.now();
 
   List<DropdownMenuItem<String>> itemsPaymentMethods = const [
     DropdownMenuItem(
@@ -414,6 +417,7 @@ class _SalesScreenState extends State<SalesScreen> {
           ? (await createFileDTO(File(_receiptFile!.path))).toMap()
           : null,
       'client': (clientToSend != null) ? clientToSend.toJson() : null,
+      'saleDate': _selectedDate.toUtc().toString(),
     };
 
     // Consumir el servicio de creación de venta
@@ -466,6 +470,22 @@ class _SalesScreenState extends State<SalesScreen> {
     // Aquí podrías guardar la venta en MongoDB o en tu base de datos local.
   }
 
+  Future<void> _selectDate() async {
+    final today = DateTime.now();
+    final newDateRange = await showDatePicker(
+      locale: const Locale('es'),
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(today.year - 5),
+      lastDate: today,
+    );
+    if (newDateRange != null) {
+      setState(() {
+        _selectedDate = newDateRange;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool _customTileExpanded = false;
@@ -475,7 +495,25 @@ class _SalesScreenState extends State<SalesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Venta'),
+        title: Column(
+          children: [
+            const Text(
+              "Venta",
+              style: TextStyle(color: Colors.white),
+            ),
+            Text(
+              DateUtilsHelper.formatDateOnly(_selectedDate),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            color: Colors.white,
+            icon: const Icon(Icons.date_range),
+            onPressed: _selectDate,
+          ),
+        ],
       ),
       body: Column(
         children: [
