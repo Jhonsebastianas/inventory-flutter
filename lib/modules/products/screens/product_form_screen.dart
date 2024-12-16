@@ -143,7 +143,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               onPressed: () {
                 final provider = _providerController.text;
                 final price = double.tryParse(_priceController.text) ?? 0.0;
-                final quantity = double.tryParse(_quantityController.text) ?? 0.0;
+                final quantity =
+                    double.tryParse(_quantityController.text) ?? 0.0;
 
                 if (quantity == 0 || price == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -329,19 +330,31 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('En inventario: $_stock',
-                        style: const TextStyle(fontSize: 16)),
-                    Text(
-                      'Precio promedio: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 16),
+                    Expanded(
+                      child: Text('En inventario: $_stock',
+                          style: const TextStyle(fontSize: 16)),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Precio promedio: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
+                CustomButton(
+                  text: 'Añadir inventario',
+                  type: ButtonType.outline,
+                  onPressed: () => _showStockDetailDialog(),
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                const SizedBox(height: 20),
                 if (_stockDetails.isNotEmpty)
                   ExpansionTile(
+                    initiallyExpanded: true,
                     title: Text(
-                      'Detalles de existencias',
+                      'Detalles de inventario',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     children: _stockDetails.map((stockDetail) {
