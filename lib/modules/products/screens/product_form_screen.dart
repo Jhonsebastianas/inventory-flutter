@@ -102,94 +102,144 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   // Mostrar el formulario para añadir o editar detalles del inventario en una ventana emergente
   void _showStockDetailDialog({StockDetail? stockDetail, int? index}) {
+    final _formKey = GlobalKey<FormState>();
+
     final _providerController =
         TextEditingController(text: stockDetail?.provider ?? '');
     final _priceController = TextEditingController(
-        text: stockDetail?.purchasePrice.toString() ?? '0.0');
+        text: stockDetail?.purchasePrice.toString() ?? '');
     final _quantityController =
-        TextEditingController(text: stockDetail?.quantity.toString() ?? '0');
+        TextEditingController(text: stockDetail?.quantity.toString() ?? '');
 
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: Text(stockDetail == null
-              ? 'Añadir Detalle de Inventario'
-              : 'Modificar Detalle de Inventario'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomTextField(
-                controller: _providerController,
-                label: 'Proveedor (opcional)',
-              ),
-              SizedBox(height: 20),
-              CustomNumberField(
-                controller: _priceController,
-                label: 'Precio de compra (unitario)',
-              ),
-              SizedBox(height: 20),
-              CustomNumberField(
-                controller: _quantityController,
-                label: 'Cantidad',
-              ),
-            ],
-          ),
-          actions: [
-            CustomButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              text: 'Cancelar',
-              type: ButtonType.flat,
-            ),
-            CustomButton(
-              onPressed: () {
-                final provider = _providerController.text;
-                final price = double.tryParse(_priceController.text) ?? 0.0;
-                final quantity =
-                    double.tryParse(_quantityController.text) ?? 0.0;
-                if (quantity == 0 || price == 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Diigencie la información')),
-                  );
-                  return;
-                }
-
-                setState(() {
-                  if (index != null) {
-                    // Editar detalle existente
-                    _stockDetails[index] = StockDetail(
-                      id: stockDetail!.id,
-                      totalGrossProfit: stockDetail!.totalGrossProfit,
-                      provider: provider,
-                      purchasePrice: price,
-                      quantity: quantity,
-                      quantityPurchased: stockDetail!.quantityPurchased,
-                      totalPurchasePrice: quantity * price,
-                    );
-                  } else {
-                    print("index == null");
-                    // Añadir nuevo detalle
-                    _stockDetails.add(
-                      StockDetail(
-                        id: (_stockDetails.length + 1).toString(),
-                        totalGrossProfit: 0.0,
-                        provider: provider,
-                        purchasePrice: price,
-                        quantity: quantity,
-                        quantityPurchased: quantity,
-                        totalPurchasePrice: quantity * price,
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: FractionallySizedBox(
+            heightFactor: 0.8, // Ocupa el 80% de la altura de la pantalla.
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey, // Asocia la clave global al formulario.
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              stockDetail == null
+                                  ? 'Añadir Detalle de Inventario'
+                                  : 'Modificar Detalle de Inventario',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            SizedBox(height: 20),
+                            CustomTextField(
+                              controller: _providerController,
+                              label: 'Proveedor (opcional)',
+                            ),
+                            SizedBox(height: 20),
+                            CustomNumberField(
+                              controller: _priceController,
+                              label: 'Precio de compra (unitario)',
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Precio de compra obligatorio';
+                                }
+                                if (double.tryParse(value) == null ||
+                                    double.parse(value) <= 0) {
+                                  return 'Ingrese un precio válido';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            CustomNumberField(
+                              controller: _quantityController,
+                              label: 'Cantidad',
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Cantidad obligatoria';
+                                }
+                                if (double.tryParse(value) == null ||
+                                    double.parse(value) <= 0) {
+                                  return 'Ingrese una cantidad válida Ej: 1, 2, 3...';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  }
-                  updateStock();
-                });
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        text: 'Cancelar',
+                        type: ButtonType.flat,
+                      ),
+                      CustomButton(
+                        onPressed: () {
+                          // Valida el formulario antes de procesar
+                          if (_formKey.currentState?.validate() ?? false) {
+                            final provider = _providerController.text;
+                            final price =
+                                double.tryParse(_priceController.text) ?? 0.0;
+                            final quantity =
+                                double.tryParse(_quantityController.text) ??
+                                    0.0;
 
-                Navigator.of(ctx).pop();
-              },
-              text: 'Agregar',
-              type: ButtonType.primary,
+                            setState(() {
+                              if (index != null) {
+                                // Editar detalle existente
+                                _stockDetails[index] = StockDetail(
+                                  id: stockDetail!.id,
+                                  totalGrossProfit:
+                                      stockDetail.totalGrossProfit,
+                                  provider: provider,
+                                  purchasePrice: price,
+                                  quantity: quantity,
+                                  quantityPurchased:
+                                      stockDetail.quantityPurchased,
+                                  totalPurchasePrice: quantity * price,
+                                );
+                              } else {
+                                // Añadir nuevo detalle
+                                _stockDetails.add(
+                                  StockDetail(
+                                    id: (_stockDetails.length + 1).toString(),
+                                    totalGrossProfit: 0.0,
+                                    provider: provider,
+                                    purchasePrice: price,
+                                    quantity: quantity,
+                                    quantityPurchased: quantity,
+                                    totalPurchasePrice: quantity * price,
+                                  ),
+                                );
+                              }
+                              updateStock();
+                            });
+
+                            Navigator.of(ctx).pop();
+                          }
+                        },
+                        text: 'Agregar',
+                        type: ButtonType.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -379,10 +429,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         ),
                         children: _stockDetails.map((stockDetail) {
                           final index = _stockDetails.indexOf(stockDetail);
-                          print("-----------------------||");
-                          print(index);
-                          print(_stockDetails[0]);
-                          print(_stockDetails[0].provider);
                           return Card(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
