@@ -147,7 +147,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 final price = double.tryParse(_priceController.text) ?? 0.0;
                 final quantity =
                     double.tryParse(_quantityController.text) ?? 0.0;
-
                 if (quantity == 0 || price == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Diigencie la información')),
@@ -168,6 +167,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       totalPurchasePrice: quantity * price,
                     );
                   } else {
+                    print("index == null");
                     // Añadir nuevo detalle
                     _stockDetails.add(
                       StockDetail(
@@ -268,7 +268,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             Navigator.pop(context, result);
             return;
           }
-          final bool shouldPop = await _showExitConfirmationDialog(context) ?? false;
+          final bool shouldPop =
+              await _showExitConfirmationDialog(context) ?? false;
           if (context.mounted && shouldPop) {
             Navigator.pop(context, result);
           }
@@ -378,6 +379,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         ),
                         children: _stockDetails.map((stockDetail) {
                           final index = _stockDetails.indexOf(stockDetail);
+                          print("-----------------------||");
+                          print(index);
+                          print(_stockDetails[0]);
+                          print(_stockDetails[0].provider);
                           return Card(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
@@ -406,8 +411,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                             backgroundColor:
                                                 Colors.blue.shade100,
                                             child: Text(
-                                              stockDetail.provider[0]
-                                                  .toUpperCase(),
+                                              (stockDetail.provider
+                                                          .isNotEmpty &&
+                                                      stockDetail.provider[0]
+                                                          .isNotEmpty
+                                                  ? stockDetail.provider[0]
+                                                      .toUpperCase()
+                                                  : 'I'),
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 24,
