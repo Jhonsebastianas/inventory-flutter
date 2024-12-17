@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:hola_mundo/core/themes/app_theme.dart';
 import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:provider/provider.dart'; // Importa provider
@@ -7,8 +8,9 @@ import 'shared/providers/product_provider.dart'; // Importa tu ProductProvider
 import 'shared/services/api_service.dart'; // Asegúrate de importar ApiService
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SemanticsBinding.instance.ensureSemantics();
   await EasyLocalization.ensureInitialized();
 
   runApp(
