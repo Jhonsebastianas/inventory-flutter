@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/shared/widgets/custom_button.dart';
 import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_number_field.dart';
 import 'package:hola_mundo/shared/widgets/forms/text_fields/custom_text_field.dart';
@@ -17,6 +18,7 @@ class ProductFormScreen extends StatefulWidget {
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _priceController = TextEditingController();
   late String _name;
   late String _description;
   late double _price;
@@ -24,6 +26,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late double _percentageTax;
   List<StockDetail> _stockDetails = [];
   late double _weightedAveragePurchasePrice;
+
+  // Calcula la ganancia neta.
+  late double _profit = _price - _weightedAveragePurchasePrice;
+
+// Calcula el margen de ganancia porcentual.
+  late double _profitPercentage =
+      _profit > 0 ? (_profit / _weightedAveragePurchasePrice) * 100 : 0;
 
   bool isModifyForm = false;
 
@@ -48,6 +57,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _stockDetails = [];
       _weightedAveragePurchasePrice = 0.0;
     }
+    _priceController.text = _price.toString();
+    _priceController.addListener(_updateProfit);
+  }
+
+  void _updateProfit() {
+    setState(() {
+      _profit = NumberFormatter.parseDouble(_priceController.text) -
+          _weightedAveragePurchasePrice;
+      // Evitar el cálculo del margen si el precio promedio es 0
+      if (_weightedAveragePurchasePrice > 0) {
+        _profitPercentage = (_profit / _weightedAveragePurchasePrice) * 100;
+      } else {
+        _profitPercentage =
+            100; // O asigna un valor que represente "sin margen"
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    _priceController.dispose();
+    super.dispose();
   }
 
   void _saveForm() {
@@ -98,6 +131,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _stock = totalStock;
       _weightedAveragePurchasePrice = sumTotalPurchasePrices / totalStock;
     });
+    _updateProfit();
   }
 
   // Mostrar el formulario para añadir o editar detalles del inventario en una ventana emergente
@@ -364,7 +398,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       children: [
                         Expanded(
                           child: CustomNumberField(
-                            initialValue: _price.toString(),
+                            controller: _priceController,
                             label: 'Precio de Venta',
                             allowDecimals: true,
                             onSaved: (value) => _price = double.parse(value!),
@@ -397,20 +431,125 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text('En inventario: $_stock',
-                              style: const TextStyle(fontSize: 16)),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Precio promedio: \$${_weightedAveragePurchasePrice.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey
+                            .shade200, // Fondo sutil para separar visualmente.
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'En inventario',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey
+                                            .shade600, // Color de texto más claro.
+                                      ),
+                                    ),
+                                    Text(
+                                      '$_stock unidades',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Precio promedio',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$${NumberFormatter.format(context, _weightedAveragePurchasePrice)}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12), // Espaciado entre filas.
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Ganancia neta',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$${NumberFormatter.format(context, _profit)}', // Calcula la ganancia.
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: _profit < 0
+                                            ? Colors.red
+                                                .shade600 // Ganancia negativa en rojo.
+                                            : Colors.green
+                                                .shade600, // Ganancia positiva en verde.
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Margen de ganancia',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_profitPercentage.toStringAsFixed(2)}%', // Calcula el margen.
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: _profitPercentage < 0
+                                            ? Colors.red
+                                                .shade600 // Margen negativo en rojo.
+                                            : Colors.blue
+                                                .shade600, // Margen positivo en azul.
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     CustomButton(
@@ -507,7 +646,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                             icon: Icons.attach_money,
                                             label: 'Precio Compra',
                                             value:
-                                                '\$${stockDetail.purchasePrice.toStringAsFixed(2)}',
+                                                '\$${NumberFormatter.format(context, stockDetail.purchasePrice)}',
                                           ),
                                           _buildDetailItem(
                                             context,

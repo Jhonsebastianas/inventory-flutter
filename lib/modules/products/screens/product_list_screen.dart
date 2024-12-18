@@ -18,22 +18,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
   String _searchQuery = ""; // Consulta de búsqueda
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  int _itemsPerPage = 10; // Número de productos por página
-  int _currentPage = 1; // Página actual
-  List<Product> _paginatedProducts = []; // Productos paginados
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
-
-    // Listener para detectar el final de la lista
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent) {
-        _loadMoreProducts();
-      }
-    });
   }
 
   @override
@@ -50,33 +39,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
         .fetchProducts(); // Llama a la función para obtener productos
   }
 
-  void _paginateProducts() {
-    final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
-    final allProducts = productProvider.products;
-
-    setState(() {
-      final startIndex = (_currentPage - 1) * _itemsPerPage;
-      final endIndex = startIndex + _itemsPerPage;
-      _paginatedProducts = allProducts.sublist(
-        startIndex,
-        endIndex > allProducts.length ? allProducts.length : endIndex,
-      );
-    });
-  }
-
-  void _loadMoreProducts() {
-    setState(() {
-      _currentPage++;
-      _paginateProducts();
-    });
-  }
-
   void _searchProduct(String query) {
     setState(() {
       _searchQuery = query.toLowerCase(); // Actualiza la consulta de búsqueda
-      _currentPage = 1; // Reinicia la paginación
-      _paginateProducts();
     });
   }
 
