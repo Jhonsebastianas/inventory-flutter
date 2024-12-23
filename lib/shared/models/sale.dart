@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:hola_mundo/core/utils/numer_formatter.dart';
 import 'package:hola_mundo/shared/models/file_dto.dart';
 
 class Sale {
@@ -46,6 +47,8 @@ class SaleProduct {
   final String? description;
   double price;
   double quantity;
+  double? profit;
+  double? totalProfit;
 
   // Convertir objeto Sale a JSON
   Map<String, dynamic> toJson() {
@@ -54,6 +57,8 @@ class SaleProduct {
       'name': name,
       'price': price,
       'quantity': quantity,
+      'profit': profit,
+      'totalProfit': totalProfit,
     };
   }
 
@@ -63,6 +68,8 @@ class SaleProduct {
       name: json['name'],
       price: json['price'].toDouble(),
       quantity: json['quantity'].toDouble(),
+      profit: NumberFormatter.parseDouble(json['profit']),
+      totalProfit: NumberFormatter.parseDouble(json['totalProfit']),
     );
   }
 
@@ -71,6 +78,8 @@ class SaleProduct {
     required this.name,
     required this.price,
     required this.quantity,
+    this.profit,
+    this.totalProfit,
     this.description
   });
 }
