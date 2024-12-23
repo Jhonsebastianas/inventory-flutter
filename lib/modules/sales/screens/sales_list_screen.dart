@@ -20,7 +20,6 @@ class _SalesListScreenState extends State<SalesListScreen> {
   late Future<List<Sale>>? _sales;
   late List<FilterSaleList> filters;
   SalesInquiries? _salesInquiries;
-  String _totalInvoiced = "0";
   DateTimeRange? _selectedDateRange;
   List<GroupedSale>? _groupedSales;
 
@@ -62,8 +61,6 @@ class _SalesListScreenState extends State<SalesListScreen> {
       // Actualizar el estado con los nuevos datos
       setState(() {
         _salesInquiries = inquiries; // Guardar los datos completos
-        _totalInvoiced =
-            inquiries.metrics?.totalInvoiced?.toStringAsFixed(2) ?? "0";
         _sales = Future.value(inquiries.sales ?? []);
         _groupedSales = null; // Reiniciar agrupación
         filterGroupedSales = false;
@@ -72,7 +69,6 @@ class _SalesListScreenState extends State<SalesListScreen> {
       print('Error al cargar las ventas del mes actual: $e');
       // Manejar errores
       setState(() {
-        _totalInvoiced = "0"; // Restablecer en caso de error
         _sales = Future.value([]); // Vaciar la lista de ventas
         _groupedSales = null; // Reiniciar agrupación
         filterGroupedSales = false;
@@ -141,9 +137,12 @@ class _SalesListScreenState extends State<SalesListScreen> {
 
       setState(() {
         _salesInquiries = inquiries; // Asignar los datos completos
-        _totalInvoiced = inquiries.metrics!.totalInvoiced!.toStringAsFixed(2);
         _sales =
             Future.value(_salesInquiries?.sales ?? []); // Extraer las ventas
+        if (filterGroupedSales) {
+          filterGroupedSales = false;
+          _groupSalesByProduct();
+        }
       });
     } catch (e) {
       setState(() {
@@ -684,7 +683,7 @@ class _SalesListScreenState extends State<SalesListScreen> {
                       context,
                       icon: Icons.attach_money,
                       label: 'Total:',
-                      value: '\$${sale.totalInvoiced.toStringAsFixed(2)}',
+                      value: '\$${NumberFormatter.format(context, sale.totalInvoiced)}',
                     ),
                     const SizedBox(height: 4),
                     _buildDetailSale(

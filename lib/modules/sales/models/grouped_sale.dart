@@ -24,8 +24,8 @@ class GroupedSale {
       productName: productName,
       totalQuantity: totalQuantity + quantity,
       totalInvoiced: totalInvoiced + invoiced,
-      totalProfit: profit,
-      profitPercentage: profit > 0 ? (profit / totalInvoiced) * 100 : 0,
+      totalProfit: totalProfit! + profit,
+      profitPercentage: totalProfit! > 0 ? (totalProfit! / totalInvoiced) * 100 : 0,
       sales: [...sales, sale],
     );
   }
