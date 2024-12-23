@@ -7,10 +7,8 @@ import 'package:hola_mundo/routes/app_routes.dart';
 import 'package:hola_mundo/shared/models/sales_consultation.dart';
 import 'package:hola_mundo/shared/models/sales_inquiries.dart';
 import 'package:hola_mundo/shared/services/sale_service.dart';
-import 'package:hola_mundo/shared/widgets/custom_button.dart';
 import 'package:hola_mundo/shared/widgets/custom_filter_chip.dart';
 import '../../../shared/models/sale.dart';
-import 'sale_detail_screen.dart';
 
 class SalesListScreen extends StatefulWidget {
   @override
@@ -302,67 +300,83 @@ class _SalesListScreenState extends State<SalesListScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      isScrollControlled: true, // Permitir mayor espacio al modal
       builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Resumen de Ventas",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+        return DraggableScrollableSheet(
+          expand: false, // Permite que el modal sea desplazable
+          initialChildSize: 0.5, // Tamaño inicial (50% de la pantalla)
+          minChildSize: 0.3, // Tamaño mínimo del modal
+          maxChildSize: 0.8, // Tamaño máximo (80% de la pantalla)
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController, // Controlador para el scroll
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      "Resumen de Ventas",
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
-              ),
-              const SizedBox(height: 16),
-              _buildStatItem(
-                context,
-                icon: Icons.attach_money_rounded,
-                label: "Facturado",
-                value: '\$ ${NumberFormatter.format(context, totalInvoiced)}',
-                iconColor: Colors.green.shade400,
-              ),
-              _buildStatItem(
-                context,
-                icon: Icons.trending_up_rounded,
-                label: "Ganancia",
-                value: NumberFormatter.format(context, totalProfit),
-                iconColor: Colors.amber.shade400,
-              ),
-              _buildStatItem(
-                context,
-                icon: Icons.percent_rounded,
-                label: "Margen",
-                value: "${NumberFormatter.format(context, profitMargin)}%",
-                iconColor: Colors.blue.shade400,
-              ),
-              _buildStatItem(
-                context,
-                icon: Icons.shopping_cart_rounded,
-                label: "Productos",
-                value: "$totalProductsSold vendidos",
-                iconColor: Colors.orange.shade400,
-              ),
-              _buildStatItem(
-                context,
-                icon: Icons.receipt_long_rounded,
-                label: "Ventas",
-                value: "$totalSales",
-                iconColor: Colors.purple.shade400,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
                   ),
-                ),
-                child: const Text("Cerrar"),
+                  const SizedBox(height: 16),
+                  _buildStatItem(
+                    context,
+                    icon: Icons.attach_money_rounded,
+                    label: "Facturado",
+                    value:
+                        '\$ ${NumberFormatter.format(context, totalInvoiced)}',
+                    iconColor: Colors.green.shade400,
+                  ),
+                  _buildStatItem(
+                    context,
+                    icon: Icons.trending_up_rounded,
+                    label: "Ganancia",
+                    value: '\$ ${NumberFormatter.format(context, totalProfit)}',
+                    iconColor: Colors.amber.shade400,
+                  ),
+                  _buildStatItem(
+                    context,
+                    icon: Icons.percent_rounded,
+                    label: "Margen",
+                    value: "${NumberFormatter.format(context, profitMargin)}%",
+                    iconColor: Colors.blue.shade400,
+                  ),
+                  _buildStatItem(
+                    context,
+                    icon: Icons.shopping_cart_rounded,
+                    label: "Productos",
+                    value: "$totalProductsSold vendidos",
+                    iconColor: Colors.orange.shade400,
+                  ),
+                  _buildStatItem(
+                    context,
+                    icon: Icons.receipt_long_rounded,
+                    label: "Ventas",
+                    value: "$totalSales",
+                    iconColor: Colors.purple.shade400,
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text("Cerrar", style: TextStyle(color: Colors.white),),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -503,15 +517,16 @@ class _SalesListScreenState extends State<SalesListScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ExpansionTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue.shade100,
-          child: Text(
-            item.productName[0], // Inicial del producto
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
         title: Row(
           children: [
+            CircleAvatar(
+              backgroundColor: Colors.blue.shade100,
+              child: Text(
+                item.productName[0], // Inicial del producto
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 item.productName,
